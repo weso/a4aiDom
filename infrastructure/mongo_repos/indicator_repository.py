@@ -2,7 +2,7 @@ __author__ = 'guillermo'
 from webindex.domain.model.indicator.indicator import Repository
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
-from utils import error, success, uri, normalize_group_name, normalize_high_low
+from utils import error, success, uri, normalize_group_name
 
 
 class IndicatorRepository(Repository):
