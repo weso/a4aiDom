@@ -33,16 +33,26 @@ class Observation(Entity):
 
     def __init__(self, event):
         super(Observation, self).__init__(event.originator_id, event.originator_version)
-        self._computations = []
-        self._issued = event.issued
-        self._publisher = event.publisher
-        self._type = event.obs_type
-        self._label = event.label
-        self._status = event.status
-        self._ref_indicator_id = None
-        self._ref_area_id = None
+        self._scored = event.scored
+        self._provider_url = event.provider_url
+        self._indicator = event.indicator
+        self._code = event.code
+        self._indicator_name = event.indicator_name
+        self._short_name = event.short_name
+        self._area = event.area
+        self._area_name = event.area_name
+        self._uri = event.uri
         self._value = event.value
-        self._ref_year = None
+        self._name = event.name
+        self._ranked = event.ranked
+        self._values = event.values
+        self._normalized = event.normalized
+        self._year = event.year
+        self._provider_name = event.provider_name
+        self._id = event.id
+        self._continent = event.continent
+        self._tendency = event.tendency
+        self._republish = event.republish
 
     def __repr__(self):
         return "{d}Observation(id={id!r}, " \
@@ -58,122 +68,198 @@ class Observation(Entity):
                    value=self._value, ref_area=self._ref_area_id,
                    ref_year=self._ref_year)
 
+    def to_dict(self):
+        return {
+            'scored': self._scored, 'provider_url': self._provider_url, 'indicator': self._indicator,
+            'code': self._code, 'indicator_name': self._indicator_name, 'short_name': self._short_name,
+            'area': self._area, 'area_name': self._area_name, 'uri': self._uri, 'value': self._value,
+            'name': self._name, 'ranked': self._ranked, 'values': self._values, 'normalized': self._normalized,
+            'year': self._year, 'provider_name': self.provider_name, 'id': self._id, 'continent': self._continent,
+            'tendency': self.tendency, 'republish': self.republish
+        }
+
     # =======================================================================================
     # Properties
     # =======================================================================================
     @property
-    def computations(self):
-        self._check_not_discarded()
-        return self._computations
+    def scored(self):
+        return self._scored
 
-
-    @property
-    def issued(self):
-        self._check_not_discarded()
-        return self._issued
-
-    @issued.setter
-    def issued(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's issue date cannot be empty")
-        self._issued = value
+    @scored.setter
+    def scored(self, scored):
+        self._scored = scored
         self.increment_version()
 
     @property
-    def publisher(self):
-        self._check_not_discarded()
-        return self._publisher
+    def provider_url(self):
+        return self._provider_url
 
-    @publisher.setter
-    def publisher(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's publisher cannot be empty")
-        self._issued = value
+    @provider_url.setter
+    def provider_url(self, provider_url):
+        self._provider_url = provider_url
         self.increment_version()
 
     @property
-    def obs_type(self):
-        self._check_not_discarded()
-        return self._type
+    def indicator(self):
+        return self._indicator
 
-    @obs_type.setter
-    def obs_type(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's type cannot be empty")
-        self._type = value
+    @indicator.setter
+    def indicator(self, indicator):
+        self._indicator = indicator
         self.increment_version()
 
     @property
-    def label(self):
-        self._check_not_discarded()
-        return self._label
+    def code(self):
+        return self._code
 
-    @label.setter
-    def label(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's label cannot be empty")
-        self._label = value
+    @code.setter
+    def code(self, code):
+        self._code = code
         self.increment_version()
 
     @property
-    def status(self):
-        self._check_not_discarded()
-        return self._status
+    def indicator_name(self):
+        return self._indicator_name
 
-    @status.setter
-    def status(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's status cannot be empty")
-        self._status = value
+    @indicator_name.setter
+    def indicator_name(self, indicator_name):
+        self._indicator_name = indicator_name
+        self.increment_version()
+
+    @property
+    def short_name(self):
+        return self._short_name
+
+    @short_name.setter
+    def short_name(self, short_name):
+        self._short_name = short_name
+        self.increment_version()
+
+    @property
+    def area(self):
+        return self._area
+
+    @area.setter
+    def area(self, area):
+        self._area = area
+        self.increment_version()
+
+    @property
+    def area_name(self):
+        return self._area_name
+
+    @area_name.setter
+    def area_name(self, area_name):
+        self._area_name = area_name
+        self.increment_version()
+
+    @property
+    def uri(self):
+        return self._uri
+
+    @uri.setter
+    def uri(self, uri):
+        self._uri = uri
         self.increment_version()
 
     @property
     def value(self):
-        self._check_not_discarded()
         return self._value
 
     @value.setter
     def value(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Observation's value cannot be empty")
         self._value = value
         self.increment_version()
 
     @property
-    def ref_area(self):
-        self._check_not_discarded()
-        return self._ref_area_id
+    def name(self):
+        return self._name
 
-    @property
-    def ref_indicator(self):
-        self._check_not_discarded()
-        return self._ref_indicator_id
-
-    @property
-    def ref_year(self):
-        """
-        Checks for object's properties
-        """
-        self._check_not_discarded()
-        return self._ref_year
-
-    @ref_year.setter
-    def ref_year(self, value):
-        self._check_not_discarded()
-        self._ref_year = value
+    @name.setter
+    def name(self, name):
+        self._name = name
         self.increment_version()
 
-    def add_computation(self, comp_type, value):
-        computation = Computation(comp_type=comp_type, value=value)
-        self._computations.append(computation)
+    @property
+    def ranked(self):
+        return self._ranked
+
+    @ranked.setter
+    def ranked(self, ranked):
+        self._ranked = ranked
         self.increment_version()
-        return computation
+
+    @property
+    def values(self):
+        return self._values
+
+    @values.setter
+    def values(self, values):
+        self._values = values
+        self.increment_version()
+
+    @property
+    def normalized(self):
+        return self._normalized
+
+    @normalized.setter
+    def normalized(self, normalized):
+        self._normalized = normalized
+        self.increment_version()
+
+    @property
+    def year(self):
+        return self._year
+
+    @year.setter
+    def year(self, year):
+        self._year = year
+        self.increment_version()
+
+    @property
+    def provider_name(self):
+        return self._provider_name
+
+    @provider_name.setter
+    def provider_name(self, provider_name):
+        self._provider_name = provider_name
+        self.increment_version()
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def continent(self):
+        return self._continent
+
+    @continent.setter
+    def continent(self, continent):
+        self._continent = continent
+        self.increment_version()
+
+    @property
+    def tendency(self):
+        return self._tendency
+
+    @tendency.setter
+    def tendency(self, tendency):
+        self._tendency = tendency
+        self.increment_version()
+
+    @property
+    def republish(self):
+        return self._republish
+
+    @republish.setter
+    def republish(self, republish):
+        self._republish = republish
+        self.increment_version()
+
+    def add_value(self, value):
+        # TODO: use event system
+        self._values.append(value)
+        self.increment_version()
 
 
     # =======================================================================================
@@ -242,14 +328,17 @@ class Observation(Entity):
 # =======================================================================================
 # Observation aggregate root factory
 # =======================================================================================
-def create_observation(issued=None, publisher=None, data_set=None, obs_type=None,
-                       label=None, status=None, ref_indicator=None, value=None,
-                       ref_area=None, ref_year=None):
+def create_observation(scored=0, provider_url=None, indicator=None, code=None, indicator_name=None,
+                       short_name=None, area=None, area_name=None, uri=None, value=0, name=None, ranked=0,
+                       values=[], normalized=0, year="1970", provider_name=None, id=None, continent=None,
+                       tendency=0, republish=False):
     obs_id = uuid.uuid4().hex[:24]
-    event = Observation.Created(originator_id=obs_id, originator_version=0, issued=issued,
-                                publisher=publisher, data_set=data_set, obs_type=obs_type,
-                                label=label, status=status, ref_indicator=ref_indicator,
-                                value=value, ref_area=ref_area, ref_year=ref_year)
+    event = Observation.Created(originator_id=obs_id, originator_version=0,
+                                scored=scored, provider_url=provider_url, indicator=indicator, code=code,
+                                indicator_name=indicator_name, short_name=short_name, area=area, area_name=area_name,
+                                uri=uri, value=value, name=name, ranked=ranked, values=values, normalized=normalized,
+                                year=year, provider_name=provider_name, id=id, continent=continent, tendency=tendency,
+                                republish=republish)
     obs = when(event)
     publish(event)
     return obs

@@ -25,6 +25,9 @@ class Year(object):
     def __hash__(self):
         return hash(tuple(itertools.chain(self.__dict__.items(), [type(self)])))
 
+    def to_dict(self):
+        return {"value": self._value}
+
     @property
     def name(self):
         return self._name
