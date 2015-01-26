@@ -1,15 +1,13 @@
+__author__ = 'Herminio'
 
-__author__ = 'guillermo'
-
-
-from webindex.domain.model.area.area import Area
 from webindex.domain.model.entity import Entity
 import uuid
 from ..events import DomainEvent, publish
 from utility.mutators import when, mutate
+from abc import ABCMeta, abstractmethod
 
 
-class Region(Area):
+class Area(Entity):
     """ Region aggregate root entity"""
     class Created(Entity.Created):
         pass
@@ -21,8 +19,15 @@ class Region(Area):
         pass
 
     def __init__(self, event):
-        super(Region, self).__init__(event)
-        self._countries = event.countries
+        super(Area, self).__init__(event.originator_id, event.originator_version)
+        self._name = event.name
+        self._short_name = event.short_name
+        self._area = event.area
+        self._uri = event.uri
+        self._iso3 = event.iso3
+        self._iso2 = event.iso2
+        self._iso_num = event.iso_num
+        self._id = event.id
 
     def __repr__(self):
         return "{d}Region(id={s._id}, type={s._type}, label={s._label}, " \
@@ -30,13 +35,42 @@ class Region(Area):
                                             s=self, n=len(self._countries))
 
     def to_dict(self):
-        dictionary = super(Region, self).to_dict()
-        dictionary['countries'] = [country.to_dict() for country in self._countries]
-        return dictionary
+        return {
+            'name': self._name, 'short_name': self._short_name, 'area': self._area,
+            'uri': self._uri, 'iso3': self._iso3, 'iso2': self._iso2,
+            'iso_num': self._iso_num, 'id': self._id
+        }
 
 # =======================================================================================
 # Properties
 # =======================================================================================
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+        self.increment_version()
+
+    @property
+    def short_name(self):
+        return self._short_name
+
+    @short_name.setter
+    def short_name(self, short_name):
+        self._short_name = short_name
+        self.increment_version()
+
+    @property
+    def area(self):
+        return self._area
+
+    @area.setter
+    def area(self, area):
+        self._area = area
+        self.increment_version()
+
     @property
     def countries(self):
         return self._countries
@@ -46,9 +80,45 @@ class Region(Area):
         self._countries = countries
         self.increment_version()
 
-    def add_country(self, country):
-        self._countries.append(country)
+    @property
+    def uri(self):
+        return self._uri
+
+    @uri.setter
+    def uri(self, uri):
+        self._uri = uri
         self.increment_version()
+
+    @property
+    def iso3(self):
+        return self._iso3
+
+    @iso3.setter
+    def iso3(self, iso3):
+        self._iso3 = iso3
+        self.increment_version()
+
+    @property
+    def iso2(self):
+        return self._iso2
+
+    @iso2.setter
+    def iso2(self, iso2):
+        self._iso2 = iso2
+        self.increment_version()
+
+    @property
+    def iso_num(self):
+        return self._iso_num
+
+    @iso_num.setter
+    def iso_num(self, iso_num):
+        self._iso_num = iso_num
+        self.increment_version()
+
+    @property
+    def id(self):
+        return self._id
 
 # =======================================================================================
 # Commands
@@ -59,7 +129,7 @@ class Region(Area):
         After a call to this method, the region can no longer be used.
         """
         self._check_not_discarded()
-        event = Region.Discarded(originator_id=self.id, originator_version=self.version)
+        event = Area.Discarded(originator_id=self.id, originator_version=self.version)
 
         self._apply(event)
         publish(event)
@@ -85,7 +155,7 @@ class Region(Area):
 
     def relate_country(self, _type="Country", iso2_code=None, iso3_code=None, label=None):
         self._check_not_discarded()
-        event = Region.CountryRelated(originator_id=self.id,
+        event = Area.CountryRelated(originator_id=self.id,
                                       originator_version=self.version,
                                       country_id=uuid.uuid4().hex[:24],
                                       country_version=0, type=_type, iso2_code=iso2_code,
@@ -99,36 +169,56 @@ class Region(Area):
         mutate(self, event)
 
 
-# =======================================================================================
-# Region aggregate root factory
-# =======================================================================================
-def create_region(name=None, short_name=None, area=None, countries=[],
-                  uri=None, iso3=None, iso2=None, iso_num=None, id=None):
-    region_id = uuid.uuid4().hex[:24]
-    event = Region.Created(originator_id=region_id, originator_version=0,
-                           name=name, short_name=short_name, area=area,
-                           countries=countries, uri=uri, iso3=iso3, iso2=iso2,
-                           iso_num=iso_num, id=id)
-    region = when(event)
-    publish(event)
-    return region
-
 
 # =======================================================================================
 # Mutators
 # =======================================================================================
-@when.register(Region.Created)
+@when.register(Area.Created)
 def _(event):
     """Create a new aggregate root"""
-    region = Region(event)
+    region = Area(event)
     region.increment_version()
     return region
 
 
-@when.register(Region.Discarded)
+@when.register(Area.Discarded)
 def _(event, region):
     region.validate_event_originator(event)
     region._discarded = True
     region.increment_version()
     return region
 
+
+
+
+# =======================================================================================
+# Area Repository
+# =======================================================================================
+class Repository(object):
+    """
+    Abstract implementation of generic queries for managing areas.
+    This will be sub-classed with an infrastructure specific implementation
+    which will customize all the queries
+    """
+    __metaclass__ = ABCMeta
+
+    def find_countries_by_code_or_income(self, area_code_or_income):
+        pass
+
+    def find_countries_by_continent_or_income_or_type(self, continent_or_income):
+        pass
+
+    def find_continents(self):
+        pass
+
+    def find_countries(self):
+        pass
+
+    def set_continent_countries(self, area):
+        pass
+
+    def area_error(self, area_code):
+        pass
+
+    def area_uri(self, area):
+        pass

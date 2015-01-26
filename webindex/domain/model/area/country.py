@@ -1,18 +1,25 @@
 __author__ = 'guillermo'
 
+import uuid
+from utility.mutators import mutate, when
+from webindex.domain.model.area.area import Area
+from webindex.domain.model.area.region import Region
+from webindex.domain.model.events import publish
 from webindex.domain.model.entity import Entity
 
 
-class Country(Entity):
+class Country(Area):
     """ Country entity """
+    class Created(Entity.Created):
+        pass
 
-    def __init__(self, event, region):
-        super(Country, self).__init__(event.country_id, event.country_version)
-        self._region = region
-        self._type = "Country"
-        self._iso2_code = event.iso2_code
-        self._iso3_code = event.iso3_code
-        self._label = event.label
+    class Discarded(Entity.Discarded):
+        pass
+
+    def __init__(self, event):
+        super(Country, self).__init__(event)
+        self._income = event.income
+        self._type = event.type
 
     def __repr__(self):
         return "{d}Country(id={id!r}, region_id={c._region.id!r}, " \
@@ -20,44 +27,79 @@ class Country(Entity):
                 format(d="Discarded" if self.discarded else "", id=self._id, c=self,
                        type=self._type)
 
+
+
 # =======================================================================================
 # Properties
 # =======================================================================================
     @property
-    def iso2_code(self):
-        self._check_not_discarded()
-        return self._iso2_code
+    def income(self):
+        return self._income
 
-    @iso2_code.setter
-    def iso2_code(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Country iso2_code cannot be empty")
-        self._iso2_code = value
+    @income.setter
+    def income(self, income):
+        self._income = income
         self.increment_version()
 
     @property
-    def iso3_code(self):
-        self._check_not_discarded()
-        return self._iso3_code
+    def type(self):
+        return self._type
 
-    @iso3_code.setter
-    def iso3_code(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Country iso3_code cannot be empty")
-        self._iso3_code = value
+    @type.setter
+    def type(self, type):
+        self._type = type
         self.increment_version()
 
-    @property
-    def label(self):
-        self._check_not_discarded()
-        return self._label
 
-    @label.setter
-    def label(self, value):
+# =======================================================================================
+# Commands
+# =======================================================================================
+    def discard(self):
+        """Discard this region.
+
+        After a call to this method, the region can no longer be used.
+        """
         self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Country label cannot be empty")
-        self._label = value
-        self.increment_version()
+        event = Region.Discarded(originator_id=self.id, originator_version=self.version)
+
+        self._apply(event)
+        publish(event)
+
+    def _apply(self, event):
+        mutate(self, event)
+
+
+# =======================================================================================
+# Region aggregate root factory
+# =======================================================================================
+def create_country(name=None, short_name=None, area=None, income=[],
+                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None):
+    country_id = uuid.uuid4().hex[:24]
+    event = Country.Created(originator_id=country_id, originator_version=0,
+                            name=name, short_name=short_name, area=area,
+                            income=income, uri=uri, iso3=iso3, iso2=iso2,
+                            iso_num=iso_num, id=id, type=type)
+    country = when(event)
+    publish(event)
+    return country
+
+
+# =======================================================================================
+# Mutators
+# =======================================================================================
+@when.register(Country.Created)
+def _(event):
+    """Create a new aggregate root"""
+    country = Country(event)
+    country.increment_version()
+    return country
+
+
+@when.register(Country.Discarded)
+def _(event, country):
+    country.validate_event_originator(event)
+    country._discarded = True
+    country.increment_version()
+    return country
+
+

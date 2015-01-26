@@ -1,11 +1,14 @@
 __author__ = 'guillermo'
-from webindex.domain.model.area import region
+
+from webindex.domain.model.area import area
+from webindex.domain.model.area.country import create_country
+from webindex.domain.model.area.region import create_region
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
 from utils import error, success, uri
 
 
-class AreaRepository(region.Repository):
+class AreaRepository(area.Repository):
     """Concrete mongodb repository for Areas.
     """
 
@@ -24,27 +27,31 @@ class AreaRepository(region.Repository):
 
         if area is None:
             # Find if code is an income code
-            countries = self.find_countries_by_continent_or_income(
-                area_code_or_income_upper)
+            # TODO: This is not working, order by is needed on method call
+            countries = self.find_countries_by_continent_or_income_or_type(area_code_or_income_upper)
             if countries is None:
                 return self.area_error(area_code_or_income)
             else:
-                return success(countries)
+                return countries
 
         self.set_continent_countries(area)
         self.area_uri(area)
+        area["short_name"] = area["name"]
 
-        return success(area)
+        return AreaDocumentAdapter().transform_to_area(area)
 
-    def find_countries_by_continent_or_income(self, continent_or_income, order):
+    def find_countries_by_continent_or_income_or_type(self, continent_or_income_or_type, order="iso3"):
         order = "name" if order is None else order
-        continent_or_income_upper = continent_or_income.upper()
+        continent_or_income_or_type_upper = continent_or_income_or_type.upper()
+        continent_or_income_or_type_title = continent_or_income_or_type.title()  # Nowadays this is the way it
+                                                                                 # is stored
         countries = self._db['areas'].find({"$or": [
-            {"area": continent_or_income},
-            {"income": continent_or_income_upper}]}).sort(order, 1)
+            {"area": continent_or_income_or_type},
+            {"income": continent_or_income_or_type_upper},
+            {"type": continent_or_income_or_type_title}]},).sort(order, 1)
 
         if countries.count() == 0:
-            return self.area_error(continent_or_income)
+            return self.area_error(continent_or_income_or_type)
 
         country_list = []
 
@@ -53,14 +60,15 @@ class AreaRepository(region.Repository):
             self.area_uri(country)
             country_list.append(country)
 
-        return success(country_list)
+        #return success(country_list)
+        return CountryDocumentAdapter().transform_to_country_list(country_list)
 
     def find_areas(self, order):
         order = "name" if order is None else order
-        continents = self.find_continents(order)["data"]
-        countries = self.find_countries(order)["data"]
+        continents = self.find_continents(order)
+        countries = self.find_countries(order)
 
-        return success(continents + countries)
+        return continents + countries
 
     def find_continents(self, order):
         order = "name" if order is None else order
@@ -74,7 +82,7 @@ class AreaRepository(region.Repository):
             self.area_uri(continent)
             continents.append(continent)
 
-        return success(continents)
+        return RegionDocumentAdapter().transform_to_region_list(continents)
 
     def find_countries(self, order):
         order = "name" if order is None else order
@@ -85,7 +93,8 @@ class AreaRepository(region.Repository):
             self.area_uri(country)
             country_list.append(country)
 
-        return success(country_list)
+        #return success(country_list)
+        return CountryDocumentAdapter().transform_to_country_list(country_list)
 
     def set_continent_countries(self, area):
         iso3 = area["iso3"]
@@ -106,3 +115,38 @@ class AreaRepository(region.Repository):
         field = "iso3" if area["iso3"] is not None else "name"
         uri(url_root=self._url_root, element=area, element_code=field,
             level="areas")
+
+
+class CountryDocumentAdapter(object):
+    def transform_to_country(self, country_document):
+        return create_country(name=country_document['name'], short_name=country_document['short_name'],
+                              area=country_document['area'], uri=country_document['uri'],
+                              iso3=country_document['iso3'], iso2=country_document['iso2'],
+                              iso_num=country_document['iso_num'], income=country_document['income'],
+                              id=country_document['_id'], type=country_document['type'])
+
+    def transform_to_country_list(self, country_document_list):
+        return [self.transform_to_country(country_document) for country_document in country_document_list]
+
+
+class RegionDocumentAdapter(object):
+    def transform_to_region(self, region_document):
+        return create_region(name=region_document['name'], short_name=region_document['short_name'],
+                             area=region_document['area'], uri=region_document['uri'],
+                             iso3=region_document['iso3'], iso2=region_document['iso2'],
+                             iso_num=region_document['iso_num'], id=region_document['_id'],
+                             countries=CountryDocumentAdapter().transform_to_country_list(region_document['countries']))
+
+    def transform_to_region_list(self, region_document_list):
+        return [self.transform_to_region(region_document) for region_document in region_document_list]
+
+
+class AreaDocumentAdapter(object):
+    def transform_to_area(self, area_document):
+        if 'countries' in area_document:
+            return RegionDocumentAdapter().transform_to_region(area_document)
+        else:
+            return CountryDocumentAdapter().transform_to_country(area_document)
+
+    def transform_to_area_list(self, area_document_list):
+        return [self.transform_to_area(area_document) for area_document in area_document_list]

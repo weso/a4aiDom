@@ -1,5 +1,7 @@
+from webindex.domain.model.observation.year import Year
+
 __author__ = 'guillermo'
-from webindex.domain.model.observation.observation import Repository
+from webindex.domain.model.observation.observation import Repository, create_observation
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
 from .indicator_repository import IndicatorRepository
@@ -332,7 +334,8 @@ class ObservationRepository(Repository):
             #observation["values"] = [ round(observation["value"], 2) ]
             #observation["previous-value"] = self.get_previous_value(observation)
 
-        return success(observation_list)
+        #return success(observation_list)
+        return ObservationDocumentAdapter().transform_to_observation_list(observation_list)
 
     def find_linked_observations(self):
         return success([obs for obs in self._db['linked_observations'].find()])
@@ -424,7 +427,8 @@ class ObservationRepository(Repository):
                 "value": year
             })
 
-        return success(year_list)
+        #return success(year_list)
+        return YearDocumentAdapter().transform_to_year_list(year_list)
 
     def get_year_array(self):
         years = self._db['observations'].distinct("year")
@@ -445,6 +449,7 @@ class ObservationRepository(Repository):
 
         indicator = self._db["indicators"].find_one({"indicator": indicator_code})
         area = self._db["areas"].find_one({"iso3": area_code})
+        print area_code
 
         observation["indicator_name"] = indicator["name"]
         observation["area_name"] = area["name"]
@@ -676,3 +681,39 @@ class ObservationRepository(Repository):
     #         }
     #
     #     return None
+
+
+class ObservationDocumentAdapter(object):
+    def transform_to_observation(self, observation_document):
+        return create_observation(scored=observation_document['scored'],
+                                  provider_url=observation_document['provider_url'],
+                                  indicator=observation_document['indicator'],
+                                  code=observation_document['code'],
+                                  indicator_name=observation_document['indicator_name'],
+                                  short_name=observation_document['short_name'],
+                                  area=observation_document['area'],
+                                  area_name=observation_document['area_name'],
+                                  uri=observation_document['uri'],
+                                  value=observation_document['value'],
+                                  name=observation_document['name'],
+                                  ranked=observation_document['ranked'],
+                                  values=observation_document['values'],
+                                  normalized=observation_document['normalized'],
+                                  year=observation_document['year'],
+                                  provider_name=observation_document['provider_name'],
+                                  id=observation_document['_id'],
+                                  continent=observation_document['continent'],
+                                  tendency=observation_document['tendency'],
+                                  republish=observation_document['republish'])
+
+    def transform_to_observation_list(self, observation_document_list):
+        return [self.transform_to_observation(observation_document)
+                for observation_document in observation_document_list]
+
+
+class YearDocumentAdapter(object):
+    def transform_to_year(self, year_document):
+        return Year(value=year_document['value'])
+
+    def transform_to_year_list(self, year_document_list):
+        return [self.transform_to_year(year_document) for year_document in year_document_list]

@@ -1,8 +1,11 @@
+import json
+
 __author__ = 'guillermo'
-from webindex.domain.model.indicator.indicator import Repository
+from webindex.domain.model.indicator.indicator import Repository, Indicator
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
 from utils import error, success, uri, normalize_group_name
+from webindex.domain.model.indicator.indicator import create_indicator
 
 
 class IndicatorRepository(Repository):
@@ -24,15 +27,16 @@ class IndicatorRepository(Repository):
         indicator["children"] = children
         # self.indicator_uri(indicator)
 
-        return success(indicator)
+        return IndicatorDocumentAdapter().transform_to_indicator(indicator)
 
     def find_indicators(self):
-        _index = self.find_indicators_index()["data"]
-        subindices = self.find_indicators_sub_indexes()["data"]
-        components = self.find_indicators_components()["data"]
-        indicators = self.find_indicators_indicators()["data"]
+        _index = self.find_indicators_index()
+        subindices = self.find_indicators_sub_indexes()
+        components = self.find_indicators_components()
+        indicators = self.find_indicators_indicators()
 
-        return success(_index + subindices + components + indicators)
+        result = (_index + subindices + components + indicators)
+        return result
 
     def find_indicators_index(self):
         return self.find_indicators_by_level("Index")
@@ -50,18 +54,19 @@ class IndicatorRepository(Repository):
         return self.find_indicators_by_level("Secondary", parent)
 
     def find_indicators_indicators(self, parent=None):
-        primary = self.find_indicators_primary(parent)["data"]
-        secondary = self.find_indicators_secondary(parent)["data"]
+        primary = self.find_indicators_primary(parent)
+        secondary = self.find_indicators_secondary(parent)
 
-        return success(primary + secondary)
+        result = (primary + secondary)
+        return result
 
     def find_indicators_by_level(self, level, parent=None):
         search = {"type": level}
 
         if parent is not None:
-            print parent
-            code = parent["indicator"]
-            _type = parent["type"].lower()
+            # print parent
+            code = parent.indicator
+            _type = parent.type.lower()
             _filter = {}
             _filter[_type] = code
             search = {"$and": [search, _filter]}
@@ -77,7 +82,8 @@ class IndicatorRepository(Repository):
             # self.indicator_uri(indicator)
             processed_indicators.append(indicator)
 
-        return success(processed_indicators)
+        #return success(processed_indicators)
+        return IndicatorDocumentAdapter().transform_to_indicator_list(processed_indicators)
 
     def find_indicator_children(self, indicator):
         indicators = self._db["indicators"].find({"parent": indicator})
@@ -125,3 +131,19 @@ class IndicatorRepository(Repository):
             self._db['indicators'].update({'_id': indicator["_id"]}, {"$set": indicator}, upsert=False)
 
 
+class IndicatorDocumentAdapter(object):
+
+    def transform_to_indicator(self, indicator_document):
+        return create_indicator(id=indicator_document['_id'],
+                         index=indicator_document['index'], indicator=indicator_document['indicator'],
+                         name=indicator_document['name'], parent=indicator_document['parent'],
+                         component=indicator_document['component'], subindex=indicator_document['subindex'],
+                         type=indicator_document['type'], provider_url=indicator_document['provider_url'],
+                         description=indicator_document['description'], uri=indicator_document['uri'],
+                         weight=indicator_document['weight'], provider_name=indicator_document['provider_name'],
+                         republish=indicator_document['republish'],
+                         children=self.transform_to_indicator_list(indicator_document['children']),
+                         high_low=indicator_document['high_low'] if 'high_low' in indicator_document else None)
+
+    def transform_to_indicator_list(self, indicator_document_list):
+        return [self.transform_to_indicator(indicator_document) for indicator_document in indicator_document_list]

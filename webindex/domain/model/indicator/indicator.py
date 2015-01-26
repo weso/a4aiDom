@@ -27,18 +27,22 @@ class Indicator(Entity):
 
     def __init__(self, event):
         super(Indicator, self).__init__(event.originator_id, event.originator_version)
-        self._country_coverage = event.country_coverage
-        self._provider_link = event.provider_link
+        self._id = event.id
+        self._index = event.index
+        self._indicator = event.indicator
+        self._name = event.name
+        self._parent = event.parent
+        self._provider_url = event.provider_url
+        self._description = event.description
+        self._component = event.component
+        self._uri = event.uri
+        self._weight = event.weight
+        self._subindex = event.subindex
+        self._type = event.type
+        self._children = event.children
+        self._provider_name = event.provider_name
         self._republish = event.republish
         self._high_low = event.high_low
-        self._type = event.type
-        self._label = event.label
-        self._comment = event.comment
-        self._notation = event.notation
-        self._interval_starts = event.interval_starts
-        self._interval_ends = event.interval_ends
-        self._code = event.code
-        self._organization = None
 
     def __repr__(self):
         return "{d}Indicator(id={id!r}," \
@@ -50,159 +54,155 @@ class Indicator(Entity):
                "interval_ends={i._interval_ends!r}, organization={i._organization})". \
             format(d="*Discarded* " if self._discarded else "", id=self._id, i=self)
 
+    def to_dict(self):
+        return {
+            'index': self._index, 'indicator': self._indicator, 'name': self._name,
+            'parent': self._parent, 'provider_url': self._provider_url, 'description': self._description,
+            'component': self._component, 'uri': self._uri, 'weight': self._weight, 'subindex': self._subindex,
+            'id': self._id, 'type': self._type, 'children': [child.to_dict() for child in self._children],
+            'high_low': self._high_low, 'provider_name': self._provider_name, 'republish': self._republish
+        }
+
     # =======================================================================================
     # Properties
     # =======================================================================================
     @property
-    def country_coverage(self):
-        self._check_not_discarded()
-        return self._country_coverage
+    def id(self):
+        return self._id
 
-    @country_coverage.setter
-    def country_coverage(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's country coverage cannot be empty")
-        self._country_coverage = value
+    @property
+    def index(self):
+        return self._index
+
+    @index.setter
+    def index(self, index):
+        self._index = index
         self.increment_version()
 
     @property
-    def provider_link(self):
-        self._check_not_discarded()
-        return self._provider_link
+    def indicator(self):
+        return self._indicator
 
-    @provider_link.setter
-    def provider_link(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's provider_link cannot be empty")
-        self._provider_link = value
+    @indicator.setter
+    def indicator(self, indicator):
+        self._indicator = indicator
+        self.increment_version()
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+        self.increment_version()
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
+        self.increment_version()
+
+    @property
+    def component(self):
+        return self._component
+
+    @component.setter
+    def component(self, component):
+        self._component = component
+        self.increment_version()
+
+    @property
+    def subindex(self):
+        return self._subindex
+
+    @subindex.setter
+    def subindex(self, subindex):
+        self._subindex = subindex
+        self.increment_version()
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        self._type = type
+        self.increment_version()
+
+    @property
+    def children(self):
+        return self._children
+
+    @children.setter
+    def children(self, children):
+        self._children = children
+        self.increment_version()
+
+    @property
+    def provider_url(self):
+        return self._provider_url
+
+    @provider_url.setter
+    def provider_url(self, provider_url):
+        self._provider_url = provider_url
+        self.increment_version()
+
+    @property
+    def description(self):
+        return self._description
+
+    @description.setter
+    def children(self, description):
+        self._description = description
+        self.increment_version()
+
+    @property
+    def uri(self):
+        return self._uri
+
+    @uri.setter
+    def uri(self, uri):
+        self._uri = uri
+        self.increment_version()
+
+    @property
+    def weight(self):
+        return self._weight
+
+    @weight.setter
+    def weight(self, weight):
+        self._weight = weight
+        self.increment_version()
+
+    @property
+    def provider_name(self):
+        return self._provider_name
+
+    @provider_name.setter
+    def provider_name(self, provider_name):
+        self._provider_name = provider_name
         self.increment_version()
 
     @property
     def republish(self):
-        self._check_not_discarded()
         return self._republish
 
     @republish.setter
-    def republish(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's republish cannot be empty")
-        self._republish = value
+    def republish(self, republish):
+        self._republish = republish
         self.increment_version()
-
-    @property
-    def code(self):
-        self._check_not_discarded()
-        return self._code
-
-    @code.setter
-    def code(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's code cannot be empty")
 
     @property
     def high_low(self):
-        self._check_not_discarded()
         return self._high_low
 
     @high_low.setter
-    def high_low(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's high_low cannot be empty")
-        self._high_low = value
-        self.increment_version()
-
-    @property
-    def ind_type(self):
-        self._check_not_discarded()
-        return self._type
-
-    @ind_type.setter
-    def ind_type(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's ind_type cannot be empty")
-        self._type = value
-        self.increment_version()
-
-    @property
-    def label(self):
-        self._check_not_discarded()
-        return self._label
-
-    @label.setter
-    def label(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's label cannot be empty")
-        self._label = value
-        self.increment_version()
-
-    @property
-    def comment(self):
-        self._check_not_discarded()
-        return self._comment
-
-    @comment.setter
-    def comment(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's comment cannot be empty")
-        self._comment = value
-        self.increment_version()
-
-    @property
-    def notation(self):
-        self._check_not_discarded()
-        return self._notation
-
-    @notation.setter
-    def notation(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's notation cannot be empty")
-        self._notation = value
-        self.increment_version()
-
-    @property
-    def interval_starts(self):
-        self._check_not_discarded()
-        return self._interval_starts
-
-    @interval_starts.setter
-    def interval_starts(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's interval_starts cannot be empty")
-        self._interval_starts = value
-        self.increment_version()
-
-    @property
-    def interval_ends(self):
-        self._check_not_discarded()
-        return self._interval_ends
-
-    @interval_ends.setter
-    def interval_ends(self, value):
-        self._check_not_discarded()
-        if len(value) < 1:
-            raise ValueError("Indicator's interval_ends cannot be empty")
-        self._interval_ends = value
-        self.increment_version()
-
-    @property
-    def organization(self):
-        self._check_not_discarded()
-        return self._organization
-
-    @organization.setter
-    def organization(self, value):
-        self._check_not_discarded()
-        self._organization = value
+    def high_low(self, high_low):
+        self._high_low = high_low
         self.increment_version()
 
     # =======================================================================================
@@ -223,7 +223,6 @@ class Indicator(Entity):
     def _apply(self, event):
         mutate(self, event)
 
-
     def add_organization(self, label=None):
         self._check_not_discarded()
         event = Indicator.OrganizationAdded(originator_id=self.id,
@@ -232,22 +231,27 @@ class Indicator(Entity):
         self._apply(event)
         publish(event)
 
+    def add_child(self, indicator):
+        # TODO: use event system
+        self._children.append(indicator)
+        self.increment_version()
+
 
 # =======================================================================================
 # Indicator aggregate root factory
 # =======================================================================================
-def create_indicator(_type=None, country_coverage=None, provider_link=None,
-                     republish=None, high_low=None, label=None, comment=None,
-                     notation=None, interval_starts=None, interval_ends=None,
-                     code=None, organization=None):
+def create_indicator(id=None, index=None, indicator=None, name=None,
+                     provider_url=None, description=None, uri= None,
+                     parent=None, component=None, weight=None,
+                     provider_name=None, republish=None, high_low=None,
+                     subindex=None, type=None, children=[]):
     indicator_id = uuid.uuid4().hex[:24]
     event = Indicator.Created(originator_id=indicator_id, originator_version=0,
-                              type=_type, country_coverage=country_coverage,
-                              provider_link=provider_link, republish=republish,
-                              high_low=high_low, label=label, comment=comment,
-                              notation=notation, interval_starts=interval_starts,
-                              interval_ends=interval_ends, code=code,
-                              organization=organization)
+                              id=id, index=index, indicator=indicator, name=name,
+                              parent=parent, component=component, provider_url=provider_url,
+                              description=description, uri=uri, weight=weight,
+                              provider_name=provider_name, republish=republish,
+                              subindex=subindex, type=type, children=children, high_low=high_low)
     indicator = when(event)
     publish(event)
     return indicator
