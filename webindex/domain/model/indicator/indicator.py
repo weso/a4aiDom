@@ -34,15 +34,15 @@ class Indicator(Entity):
         self._parent = event.parent
         self._provider_url = event.provider_url
         self._description = event.description
-        self._component = event.component
+        #self._component = event.component
         self._uri = event.uri
-        self._weight = event.weight
+        #self._weight = event.weight
         self._subindex = event.subindex
         self._type = event.type
         self._children = event.children
         self._provider_name = event.provider_name
         self._republish = event.republish
-        self._high_low = event.high_low
+        #self._high_low = event.high_low
 
     def __repr__(self):
         return "{d}Indicator(id={id!r}," \
@@ -58,9 +58,13 @@ class Indicator(Entity):
         return {
             'index': self._index, 'indicator': self._indicator, 'name': self._name,
             'parent': self._parent, 'provider_url': self._provider_url, 'description': self._description,
-            'component': self._component, 'uri': self._uri, 'weight': self._weight, 'subindex': self._subindex,
+            #'component': self._component,
+            'uri': self._uri,
+            #'weight': self._weight,
+            'subindex': self._subindex,
             'id': self._id, 'type': self._type, 'children': [child.to_dict() for child in self._children],
-            'high_low': self._high_low, 'provider_name': self._provider_name, 'republish': self._republish
+            #'high_low': self._high_low,
+            'provider_name': self._provider_name, 'republish': self._republish
         }
 
     # =======================================================================================
@@ -106,14 +110,14 @@ class Indicator(Entity):
         self._parent = parent
         self.increment_version()
 
-    @property
-    def component(self):
-        return self._component
-
-    @component.setter
-    def component(self, component):
-        self._component = component
-        self.increment_version()
+    # @property
+    # def component(self):
+    #     return self._component
+    #
+    # @component.setter
+    # def component(self, component):
+    #     self._component = component
+    #     self.increment_version()
 
     @property
     def subindex(self):
@@ -242,16 +246,24 @@ class Indicator(Entity):
 # =======================================================================================
 def create_indicator(id=None, index=None, indicator=None, name=None,
                      provider_url=None, description=None, uri= None,
-                     parent=None, component=None, weight=None,
-                     provider_name=None, republish=None, high_low=None,
+                     parent=None,
+                     #component=None,
+                     # weight=None,
+                     provider_name=None, republish=None,
+                     # high_low=None,
                      subindex=None, type=None, children=[]):
     indicator_id = uuid.uuid4().hex[:24]
     event = Indicator.Created(originator_id=indicator_id, originator_version=0,
                               id=id, index=index, indicator=indicator, name=name,
-                              parent=parent, component=component, provider_url=provider_url,
-                              description=description, uri=uri, weight=weight,
+                              parent=parent,
+                              #component=component,
+                              provider_url=provider_url,
+                              description=description, uri=uri,
+                              #weight=weight,
                               provider_name=provider_name, republish=republish,
-                              subindex=subindex, type=type, children=children, high_low=high_low)
+                              subindex=subindex, type=type, children=children,
+                              #high_low=high_low
+                              )
     indicator = when(event)
     publish(event)
     return indicator
