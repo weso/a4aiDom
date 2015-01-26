@@ -105,7 +105,6 @@ class IndicatorRepository(Repository):
         indicator_dict["_id"] = indicator.id
         indicator_dict["index"] = normalize_group_name(index_name)
         indicator_dict["subindex"] = normalize_group_name(subindex_name)
-        indicator_dict["component"] = normalize_group_name(component_name)
         indicator_dict["indicator"] = indicator.code
         indicator_dict["name"] = indicator.label
         indicator_dict["description"] = indicator.comment
