@@ -43,7 +43,7 @@ class IndicatorRepository(Repository):
         return self.find_indicators_by_level("Index")
 
     def find_indicators_sub_indexes(self):
-        return self.find_indicators_by_level("Subindex")
+        return self.find_indicators_by_level("SubIndex")
 
     #def find_indicators_components(self, parent=None):
     #    return self.find_indicators_by_level("Component", parent)
@@ -90,11 +90,11 @@ class IndicatorRepository(Repository):
         # TODO: These queries may change due to change in data
         if indicator['type'] == 'Index':
             indicators = self._db["indicators"].find({"$and":
-                                                      [{"index": indicator['indicator'].upper()},
-                                                       {"type": "Subindex"}]})
-        elif indicator['type'] == 'Subindex':
+                                                      [{"index": indicator['indicator']},
+                                                       {"type": "SubIndex"}]})
+        elif indicator['type'] == 'SubIndex':
             indicators = self._db["indicators"].find({"$and":
-                                                          [{"subindex": indicator['indicator'].upper()},
+                                                          [{"subindex": indicator['indicator']},
                                                            {"$or": [{"type": "Primary"}, {"type": "Secondary"}]}]})
 
         else:
