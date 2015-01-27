@@ -121,7 +121,6 @@ class IndicatorRepository(Repository):
     def insert_indicator(self, indicator, indicator_uri=None, component_name=None, subindex_name=None, index_name=None,
                          weight=None, provider_name=None, provider_url=None):
         indicator_dict = {}
-        indicator_dict["_id"] = indicator.id
         indicator_dict["index"] = normalize_group_name(index_name)
         indicator_dict["subindex"] = normalize_group_name(subindex_name)
         indicator_dict["indicator"] = indicator.code
