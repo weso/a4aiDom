@@ -709,7 +709,7 @@ class ObservationDocumentAdapter(object):
                                   provider_name=observation_document['provider_name'],
                                   id=observation_document['_id'],
                                   continent=observation_document['continent'],
-                                  tendency=observation_document['tendency'],
+                                  #tendency=observation_document['tendency'],
                                   republish=observation_document['republish'])
 
     def transform_to_observation_list(self, observation_document_list):
