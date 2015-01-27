@@ -9,6 +9,7 @@ from .area_repository import AreaRepository
 from utils import success, normalize_group_name
 from .visualization_repository import VisualizationRepository
 from .ranking_repository import RankingRepository
+import random
 
 
 
@@ -291,6 +292,11 @@ class ObservationRepository(Repository):
     def find_observations(self, indicator_code=None, area_code=None, year=None):
         filters = []
 
+        # TODO: this code is while real observations are not loaded, see also line: observation["area_name"] = area["name"]
+        indicators = ['ITU_G', 'ITU_O', 'WB_A', 'ITU_B', 'WI_B', 'WEF_B', 'ITU_N']
+        indicator_code = indicators[random.randint(0, len(indicators)-1)]
+
+
         if indicator_code is not None:
             # Check that the indicator exists
             indicator_filter = self.get_indicators_by_code(indicator_code)
@@ -449,10 +455,10 @@ class ObservationRepository(Repository):
 
         indicator = self._db["indicators"].find_one({"indicator": indicator_code})
         area = self._db["areas"].find_one({"iso3": area_code})
-        print area_code
 
         observation["indicator_name"] = indicator["name"]
-        observation["area_name"] = area["name"]
+        # TODO: uncomment here. This is useful to verify if this country exists on db
+        #observation["area_name"] = area["name"]
 
     def insert_observation(self, observation, observation_uri=None, area_iso3_code=None, indicator_code=None,
                            year_literal=None, area_name=None, indicator_name=None, previous_value=None,
