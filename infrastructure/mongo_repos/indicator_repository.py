@@ -123,10 +123,10 @@ class IndicatorRepository(Repository):
         indicator_dict = {}
         indicator_dict["index"] = normalize_group_name(index_name)
         indicator_dict["subindex"] = normalize_group_name(subindex_name)
-        indicator_dict["indicator"] = indicator.code
-        indicator_dict["name"] = indicator.label
-        indicator_dict["description"] = indicator.comment
-        indicator_dict["type"] = indicator.ind_type
+        indicator_dict["indicator"] = indicator.indicator
+        indicator_dict["name"] = indicator.name
+        indicator_dict["description"] = indicator.description
+        indicator_dict["type"] = indicator.type
         indicator_dict["parent"] = normalize_group_name(component_name)
         indicator_dict['uri'] = indicator_uri
         indicator_dict['republish'] = indicator.republish
