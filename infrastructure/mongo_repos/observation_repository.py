@@ -457,8 +457,7 @@ class ObservationRepository(Repository):
         area = self._db["areas"].find_one({"iso3": area_code})
 
         observation["indicator_name"] = indicator["name"]
-        # TODO: uncomment here. This is useful to verify if this country exists on db
-        #observation["area_name"] = area["name"]
+        observation["area_name"] = area["name"]
 
     def insert_observation(self, observation, observation_uri=None, area_iso3_code=None, indicator_code=None,
                            year_literal=None, area_name=None, indicator_name=None, previous_value=None,
