@@ -1,11 +1,13 @@
+
 __author__ = 'guillermo'
 
+from infrastructure.errors.errors import AreaRepositoryError
 from webindex.domain.model.area import area
 from webindex.domain.model.area.country import create_country
 from webindex.domain.model.area.region import create_region
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
-from utils import error, success, uri
+from utils import error, uri
 
 
 class AreaRepository(area.Repository):
@@ -24,7 +26,7 @@ class AreaRepository(area.Repository):
             {"name": area_name.lower()},
         ]})
         if area is None:
-            return {} # TODO: return error
+            raise AreaRepositoryError("No area with name " + area_name)
         self.area_uri(area)
         return AreaDocumentAdapter().transform_to_area(area)
 
@@ -42,7 +44,7 @@ class AreaRepository(area.Repository):
             # TODO: This is not working, order by is needed on method call
             countries = self.find_countries_by_continent_or_income_or_type(area_code_or_income_upper)
             if countries is None:
-                return self.area_error(area_code_or_income)
+                raise AreaRepositoryError("No countries for code " + area_code_or_income)
             else:
                 return countries
 
@@ -63,7 +65,7 @@ class AreaRepository(area.Repository):
             {"type": continent_or_income_or_type_title}]},).sort(order, 1)
 
         if countries.count() == 0:
-            return self.area_error(continent_or_income_or_type)
+            raise AreaRepositoryError("No countries for code " + continent_or_income_or_type)
 
         country_list = []
 
