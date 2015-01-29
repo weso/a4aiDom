@@ -16,6 +16,18 @@ class AreaRepository(area.Repository):
         self._db = connect_to_db(host=host, port=port, db_name=db_name)
         self._url_root = url_root
 
+    def find_by_name(self, area_name):
+        area = self._db['areas'].find_one({"$or": [
+            {"name": area_name},
+            {"name": area_name.upper()},
+            {"name": area_name.title()},
+            {"name": area_name.lower()},
+        ]})
+        if area is None:
+            return {} # TODO: return error
+        self.area_uri(area)
+        return AreaDocumentAdapter().transform_to_area(area)
+
     def find_countries_by_code_or_income(self, area_code_or_income):
         area_code_or_income_upper = area_code_or_income.upper()
         area = self._db['areas'].find_one({"$or": [
