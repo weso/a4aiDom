@@ -1,6 +1,7 @@
-import json
-
 __author__ = 'guillermo'
+
+
+from infrastructure.errors.errors import IndicatorRepositoryError
 from webindex.domain.model.indicator.indicator import Repository, Indicator
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
@@ -21,7 +22,7 @@ class IndicatorRepository(Repository):
         indicator = self._db['indicators'].find_one({"indicator": indicator_code})
 
         if indicator is None:
-            return self.indicator_error(indicator_code)
+            raise IndicatorRepositoryError("No indicator with code " + indicator_code)
 
         children = self.find_indicator_children(indicator)
         indicator["children"] = children

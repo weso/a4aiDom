@@ -1,7 +1,9 @@
-from webindex.domain.model.observation.year import Year
-
 __author__ = 'guillermo'
+
+
 from webindex.domain.model.observation.observation import Repository, create_observation
+from webindex.domain.model.observation.year import Year
+from infrastructure.errors.errors import IndicatorRepositoryError, AreaRepositoryError
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
 from .indicator_repository import IndicatorRepository
@@ -10,7 +12,6 @@ from utils import success, normalize_group_name
 from .visualization_repository import VisualizationRepository
 from .ranking_repository import RankingRepository
 import random
-
 
 
 class ObservationRepository(Repository):
@@ -302,7 +303,7 @@ class ObservationRepository(Repository):
             indicator_filter = self.get_indicators_by_code(indicator_code)
 
             if indicator_filter is None:
-                return self._indicator.indicator_error(indicator_code)
+                raise IndicatorRepositoryError("No indicator with code " + indicator_code)
 
             filters.append(indicator_filter)
 
@@ -313,7 +314,7 @@ class ObservationRepository(Repository):
                 area_filter = area_filter["area_filter"]
 
             if area_filter is None:
-                return self._area.area_error(area_code)
+                raise AreaRepositoryError("No area with code " + area_code)
 
             filters.append(area_filter)
 
