@@ -135,7 +135,8 @@ class CountryDocumentAdapter(object):
                               area=country_document['area'], uri=country_document['uri'],
                               iso3=country_document['iso3'], iso2=country_document['iso2'],
                               iso_num=country_document['iso_num'], income=country_document['income'],
-                              id=country_document['_id'], type=country_document['type'])
+                              id=country_document['_id'], type=country_document['type'],
+                              search=country_document['search'])
 
     def transform_to_country_list(self, country_document_list):
         return [self.transform_to_country(country_document) for country_document in country_document_list]
@@ -147,6 +148,7 @@ class RegionDocumentAdapter(object):
                              area=region_document['area'], uri=region_document['uri'],
                              iso3=region_document['iso3'], iso2=region_document['iso2'],
                              iso_num=region_document['iso_num'], id=region_document['_id'],
+                             search=region_document['search'],
                              countries=CountryDocumentAdapter().transform_to_country_list(region_document['countries']))
 
     def transform_to_region_list(self, region_document_list):
