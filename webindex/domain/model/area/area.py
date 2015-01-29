@@ -28,6 +28,7 @@ class Area(Entity):
         self._iso2 = event.iso2
         self._iso_num = event.iso_num
         self._id = event.id
+        self._search = event.search
 
     def __repr__(self):
         return "{d}Region(id={s._id}, type={s._type}, label={s._label}, " \
@@ -38,7 +39,7 @@ class Area(Entity):
         return {
             'name': self._name, 'short_name': self._short_name, 'area': self._area,
             'uri': self._uri, 'iso3': self._iso3, 'iso2': self._iso2,
-            'iso_num': self._iso_num, 'id': self._id
+            'iso_num': self._iso_num, 'id': self._id, "search": self._search
         }
 
 # =======================================================================================
@@ -119,6 +120,15 @@ class Area(Entity):
     @property
     def id(self):
         return self._id
+
+    @property
+    def search(self):
+        return self._search
+
+    @search.setter
+    def search(self, search):
+        self._search = search
+        self.increment_version()
 
 # =======================================================================================
 # Commands

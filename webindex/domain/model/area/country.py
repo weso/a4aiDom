@@ -73,12 +73,12 @@ class Country(Area):
 # Region aggregate root factory
 # =======================================================================================
 def create_country(name=None, short_name=None, area=None, income=[],
-                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None):
+                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None, search=None):
     country_id = uuid.uuid4().hex[:24]
     event = Country.Created(originator_id=country_id, originator_version=0,
                             name=name, short_name=short_name, area=area,
                             income=income, uri=uri, iso3=iso3, iso2=iso2,
-                            iso_num=iso_num, id=id, type=type)
+                            iso_num=iso_num, id=id, type=type, search=search)
     country = when(event)
     publish(event)
     return country
