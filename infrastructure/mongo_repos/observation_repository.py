@@ -456,9 +456,10 @@ class ObservationRepository(Repository):
         observation["area_name"] = area["name"]
 
     def insert_observation(self, observation, observation_uri=None, area_iso3_code=None, indicator_code=None,
-                           year_literal=None, area_name=None, indicator_name=None, previous_value=None,
+                           year_literal=None, area_name=None, area_code=None, indicator_name=None, previous_value=None,
                            year_of_previous_value=None, republish=True, provider_name="WF (Web Foundation)",
-                           provider_url="http://webfoundation.org/", tendency=1):  # Refactor please...
+                           provider_url="http://webfoundation.org/", short_name=None,
+                           area_type=None, tendency=1):  # Refactor please...
         """
         It takes the info of indicator and area through the optional params area_iso3_code,
         indicator_code and year_literal
@@ -468,40 +469,25 @@ class ObservationRepository(Repository):
         :param year_literal:
         :return:
         """
-        norm_value = self._look_for_computation("normalized", observation)
-        scored_value = self._look_for_computation("scored", observation)
-        propper_values_content = round(observation.value, 2)
-        if scored_value is not None:
-            propper_values_content = round(scored_value, 2)
-
-        # elif norm_value is not None:
-        #     propper_values_content = norm_value
 
         observation_dict = {}
-        observation_dict['_id'] = observation.id
-        observation_dict['normalized'] = norm_value
         observation_dict['area'] = area_iso3_code
         observation_dict['area_name'] = area_name
         observation_dict['indicator'] = normalize_group_name(indicator_code)
         observation_dict['indicator_name'] = indicator_name
         observation_dict['value'] = observation.value
-        observation_dict['year'] = str(observation.ref_year.value)
-        observation_dict['values'] = [propper_values_content]
+        observation_dict['year'] = str(observation.year.value)
         observation_dict['uri'] = observation_uri
         # observation_dict['previous_value'] = self._build_previous_value_object(previous_value,
         #                                                                        year_of_previous_value,
         #                                                                        propper_values_content)
         observation_dict['republish'] = republish
-        observation_dict['scored'] = scored_value
-        ranked_value = self._look_for_computation("ranked", observation)
-        if ranked_value is not None:
-            ranked_value = int(ranked_value)
-        observation_dict['ranked'] = ranked_value
-        observation_dict['continent'] = self._look_for_continent_iso3(area_iso3_code)
-        observation_dict['short_name'] = self._look_for_short_name(area_iso3_code)
+        observation_dict['continent'] = area_code
+        observation_dict['short_name'] = short_name
         observation_dict['provider_name'] = provider_name
         observation_dict['provider_url'] = provider_url
         observation_dict['tendency'] = tendency
+        observation_dict['area_type'] = area_type
 
 
 
