@@ -293,11 +293,6 @@ class ObservationRepository(Repository):
     def find_observations(self, indicator_code=None, area_code=None, year=None):
         filters = []
 
-        # TODO: this code is while real observations are not loaded, see also line: observation["area_name"] = area["name"]
-        indicators = ['ITU_G', 'ITU_O', 'WB_A', 'ITU_B', 'WI_B', 'WEF_B', 'ITU_N']
-        indicator_code = indicators[random.randint(0, len(indicators)-1)]
-
-
         if indicator_code is not None:
             # Check that the indicator exists
             indicator_filter = self.get_indicators_by_code(indicator_code)
