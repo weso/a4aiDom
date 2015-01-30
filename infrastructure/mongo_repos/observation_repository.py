@@ -11,7 +11,7 @@ from .area_repository import AreaRepository
 from utils import success, normalize_group_name
 from .visualization_repository import VisualizationRepository
 from .ranking_repository import RankingRepository
-import random
+from webindex.domain.model.observation.statistics import Statistics
 
 
 class ObservationRepository(Repository):
@@ -669,6 +669,10 @@ class ObservationRepository(Repository):
     #
     #     return None
 
+    def find_observations_statistics(self, indicator_code=None, area_code=None, year=None):
+        return StatisticsDocumentAdapter().transform_to_statistics(
+            self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year))
+
 
 class ObservationDocumentAdapter(object):
     def transform_to_observation(self, observation_document):
@@ -699,3 +703,8 @@ class YearDocumentAdapter(object):
 
     def transform_to_year_list(self, year_document_list):
         return [self.transform_to_year(year_document) for year_document in year_document_list]
+
+
+class StatisticsDocumentAdapter(object):
+    def transform_to_statistics(self, observations):
+        return Statistics(observations)
