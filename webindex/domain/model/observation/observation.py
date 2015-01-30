@@ -33,26 +33,21 @@ class Observation(Entity):
 
     def __init__(self, event):
         super(Observation, self).__init__(event.originator_id, event.originator_version)
-        self._scored = event.scored
         self._provider_url = event.provider_url
         self._indicator = event.indicator
-        self._code = event.code
         self._indicator_name = event.indicator_name
         self._short_name = event.short_name
         self._area = event.area
         self._area_name = event.area_name
         self._uri = event.uri
         self._value = event.value
-        self._name = event.name
-        self._ranked = event.ranked
-        self._values = event.values
-        self._normalized = event.normalized
         self._year = event.year
         self._provider_name = event.provider_name
         self._id = event.id
         self._continent = event.continent
-        #self._tendency = event.tendency
+        self._tendency = event.tendency
         self._republish = event.republish
+        self._area_type = event.area_type
 
     def __repr__(self):
         return "{d}Observation(id={id!r}, " \
@@ -70,26 +65,16 @@ class Observation(Entity):
 
     def to_dict(self):
         return {
-            'scored': self._scored, 'provider_url': self._provider_url, 'indicator': self._indicator,
-            'code': self._code, 'indicator_name': self._indicator_name, 'short_name': self._short_name,
-            'area': self._area, 'area_name': self._area_name, 'uri': self._uri, 'value': self._value,
-            'name': self._name, 'ranked': self._ranked, 'values': self._values, 'normalized': self._normalized,
-            'year': self._year, 'provider_name': self.provider_name, 'id': self._id, 'continent': self._continent,
-            #'tendency': self.tendency,
-            'republish': self.republish
+            'provider_url': self.provider_url, 'indicator': self.indicator, 'indicator_name': self.indicator_name,
+            'short_name': self.short_name, 'area': self.area, 'area_name': self.area_name, 'uri': self.uri,
+            'value': self.value, 'year': self.year, 'provider_name': self.provider_name, 'id': self.id,
+            'continent': self.continent, 'tendency': self.tendency, 'republish': self.republish,
+            'area_type': self.area_type
         }
 
     # =======================================================================================
     # Properties
     # =======================================================================================
-    @property
-    def scored(self):
-        return self._scored
-
-    @scored.setter
-    def scored(self, scored):
-        self._scored = scored
-        self.increment_version()
 
     @property
     def provider_url(self):
@@ -107,15 +92,6 @@ class Observation(Entity):
     @indicator.setter
     def indicator(self, indicator):
         self._indicator = indicator
-        self.increment_version()
-
-    @property
-    def code(self):
-        return self._code
-
-    @code.setter
-    def code(self, code):
-        self._code = code
         self.increment_version()
 
     @property
@@ -173,39 +149,12 @@ class Observation(Entity):
         self.increment_version()
 
     @property
-    def name(self):
-        return self._name
+    def value(self):
+        return self._value
 
-    @name.setter
-    def name(self, name):
-        self._name = name
-        self.increment_version()
-
-    @property
-    def ranked(self):
-        return self._ranked
-
-    @ranked.setter
-    def ranked(self, ranked):
-        self._ranked = ranked
-        self.increment_version()
-
-    @property
-    def values(self):
-        return self._values
-
-    @values.setter
-    def values(self, values):
-        self._values = values
-        self.increment_version()
-
-    @property
-    def normalized(self):
-        return self._normalized
-
-    @normalized.setter
-    def normalized(self, normalized):
-        self._normalized = normalized
+    @value.setter
+    def value(self, value):
+        self._value = value
         self.increment_version()
 
     @property
@@ -239,14 +188,14 @@ class Observation(Entity):
         self._continent = continent
         self.increment_version()
 
-    # @property
-    # def tendency(self):
-    #     return self._tendency
-    #
-    # @tendency.setter
-    # def tendency(self, tendency):
-    #     self._tendency = tendency
-    #     self.increment_version()
+    @property
+    def tendency(self):
+        return self._tendency
+
+    @tendency.setter
+    def tendency(self, tendency):
+        self._tendency = tendency
+        self.increment_version()
 
     @property
     def republish(self):
@@ -257,11 +206,14 @@ class Observation(Entity):
         self._republish = republish
         self.increment_version()
 
-    def add_value(self, value):
-        # TODO: use event system
-        self._values.append(value)
-        self.increment_version()
+    @property
+    def area_type(self):
+        return self._area_type
 
+    @area_type.setter
+    def area_type(self, area_type):
+        self._area_type = area_type
+        self.increment_version()
 
     # =======================================================================================
     # Commands
@@ -277,10 +229,6 @@ class Observation(Entity):
 
         self._apply(event)
         publish(event)
-
-
-
-
 
     def reference_indicator(self, indicator):
         """Reference an indicator from this observation.
@@ -329,19 +277,16 @@ class Observation(Entity):
 # =======================================================================================
 # Observation aggregate root factory
 # =======================================================================================
-def create_observation(scored=0, provider_url=None, indicator=None, code=None, indicator_name=None,
-                       short_name=None, area=None, area_name=None, uri=None, value=0, name=None, ranked=0,
-                       values=[], normalized=0, year="1970", provider_name=None, id=None, continent=None,
-                       #tendency=0,
-                       republish=False):
+def create_observation(provider_url=None, indicator=None, indicator_name=None,
+                       short_name=None, area=None, area_name=None, uri=None, value=0,
+                       year="1970", provider_name=None, id=None, continent=None,
+                       tendency=0, republish=False, area_type=None):
     obs_id = uuid.uuid4().hex[:24]
     event = Observation.Created(originator_id=obs_id, originator_version=0,
-                                scored=scored, provider_url=provider_url, indicator=indicator, code=code,
-                                indicator_name=indicator_name, short_name=short_name, area=area, area_name=area_name,
-                                uri=uri, value=value, name=name, ranked=ranked, values=values, normalized=normalized,
-                                year=year, provider_name=provider_name, id=id, continent=continent,
-                                #tendency=tendency,
-                                republish=republish)
+                                provider_url=provider_url, indicator=indicator, indicator_name=indicator_name,
+                                short_name=short_name, area=area, area_name=area_name,
+                                uri=uri, value=value, year=year, provider_name=provider_name, id=id,
+                                continent=continent, tendency=tendency, republish=republish, area_type=area_type)
     obs = when(event)
     publish(event)
     return obs

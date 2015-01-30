@@ -56,15 +56,15 @@ class Indicator(Entity):
 
     def to_dict(self):
         return {
-            'index': self._index, 'indicator': self._indicator, 'name': self._name,
-            'parent': self._parent, 'provider_url': self._provider_url, 'description': self._description,
+            'index': self.index, 'indicator': self.indicator, 'name': self.name,
+            'parent': self.parent, 'provider_url': self.provider_url, 'description': self.description,
             #'component': self._component,
-            'uri': self._uri,
+            'uri': self.uri,
             #'weight': self._weight,
-            'subindex': self._subindex,
-            'id': self._id, 'type': self._type, 'children': [child.to_dict() for child in self._children],
+            'subindex': self.subindex,
+            'id': self.id, 'type': self.type, 'children': [child.to_dict() for child in self.children],
             #'high_low': self._high_low,
-            'provider_name': self._provider_name, 'republish': self._republish
+            'provider_name': self.provider_name, 'republish': self.republish
         }
 
     # =======================================================================================
@@ -158,11 +158,6 @@ class Indicator(Entity):
     @property
     def description(self):
         return self._description
-
-    @description.setter
-    def children(self, description):
-        self._description = description
-        self.increment_version()
 
     @property
     def uri(self):

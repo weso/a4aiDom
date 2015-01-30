@@ -686,26 +686,21 @@ class ObservationRepository(Repository):
 
 class ObservationDocumentAdapter(object):
     def transform_to_observation(self, observation_document):
-        return create_observation(scored=observation_document['scored'],
-                                  provider_url=observation_document['provider_url'],
+        return create_observation(provider_url=observation_document['provider_url'],
                                   indicator=observation_document['indicator'],
-                                  code=observation_document['code'],
                                   indicator_name=observation_document['indicator_name'],
                                   short_name=observation_document['short_name'],
                                   area=observation_document['area'],
                                   area_name=observation_document['area_name'],
                                   uri=observation_document['uri'],
                                   value=observation_document['value'],
-                                  name=observation_document['name'],
-                                  ranked=observation_document['ranked'],
-                                  values=observation_document['values'],
-                                  normalized=observation_document['normalized'],
                                   year=observation_document['year'],
                                   provider_name=observation_document['provider_name'],
                                   id=observation_document['_id'],
                                   continent=observation_document['continent'],
-                                  #tendency=observation_document['tendency'],
-                                  republish=observation_document['republish'])
+                                  tendency=observation_document['tendency'],
+                                  republish=observation_document['republish'],
+                                  area_type=observation_document['area_type'],)
 
     def transform_to_observation_list(self, observation_document_list):
         return [self.transform_to_observation(observation_document)

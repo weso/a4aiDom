@@ -37,9 +37,9 @@ class Area(Entity):
 
     def to_dict(self):
         return {
-            'name': self._name, 'short_name': self._short_name, 'area': self._area,
-            'uri': self._uri, 'iso3': self._iso3, 'iso2': self._iso2,
-            'iso_num': self._iso_num, 'id': self._id, "search": self._search
+            'name': self.name, 'short_name': self.short_name, 'area': self.area,
+            'uri': self.uri, 'iso3': self.iso3, 'iso2': self.iso2,
+            'iso_num': self.iso_num, 'id': self.id, "search": self.search
         }
 
 # =======================================================================================
