@@ -27,6 +27,12 @@ class Country(Area):
                 format(d="Discarded" if self.discarded else "", id=self._id, c=self,
                        type=self._type)
 
+    def to_dict(self):
+        dictionary = super(Country, self).to_dict()
+        dictionary['income'] = self.income
+        dictionary['type'] = self.type
+        return dictionary
+
 
 
 # =======================================================================================
@@ -49,7 +55,6 @@ class Country(Area):
     def type(self, type):
         self._type = type
         self.increment_version()
-
 
 # =======================================================================================
 # Commands
