@@ -290,7 +290,7 @@ class ObservationRepository(Repository):
             "region": "ALL"
         }
 
-    def find_observations(self, indicator_code=None, area_code=None, year=None):
+    def find_observations(self, indicator_code=None, area_code=None, year=None, area_type=None):
         filters = []
 
         if indicator_code is not None:
@@ -317,6 +317,13 @@ class ObservationRepository(Repository):
 
         if year_filter is not None:
             filters.append(year_filter)
+
+        if area_type is not None:
+            filters.append({"$or": [
+                {"area_type": area_type},
+                {"area_type": area_type.upper()},
+                {"area_type": area_type.title()}
+            ]})
 
         search = {}
 
