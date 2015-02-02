@@ -458,8 +458,7 @@ class ObservationRepository(Repository):
     def insert_observation(self, observation, observation_uri=None, area_iso3_code=None, indicator_code=None,
                            year_literal=None, area_name=None, area_code=None, indicator_name=None, previous_value=None,
                            year_of_previous_value=None, republish=True, provider_name="WF (Web Foundation)",
-                           provider_url="http://webfoundation.org/", short_name=None,
-                           area_type=None, tendency=1):  # Refactor please...
+                           provider_url="http://webfoundation.org/", short_name=None, area_type=None):  # Refactor please...
         """
         It takes the info of indicator and area through the optional params area_iso3_code,
         indicator_code and year_literal
@@ -486,10 +485,7 @@ class ObservationRepository(Repository):
         observation_dict['short_name'] = short_name
         observation_dict['provider_name'] = provider_name
         observation_dict['provider_url'] = provider_url
-        observation_dict['tendency'] = tendency
         observation_dict['area_type'] = area_type
-
-
 
         self._db['observations'].insert(observation_dict)
 
