@@ -343,8 +343,8 @@ class ObservationRepository(Repository):
             #observation["values"] = [ round(observation["value"], 2) ]
             #observation["previous-value"] = self.get_previous_value(observation)
 
-        #return success(observation_list)
-        return ObservationDocumentAdapter().transform_to_observation_list(observation_list)
+        observations = ObservationDocumentAdapter().transform_to_observation_list(observation_list)
+        return sorted(observations, key=lambda obs: obs.ranking)  # returning the observations in ranking order
 
     def find_linked_observations(self):
         return success([obs for obs in self._db['linked_observations'].find()])
