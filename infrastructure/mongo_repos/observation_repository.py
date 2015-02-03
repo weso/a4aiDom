@@ -515,19 +515,10 @@ class ObservationRepository(Repository):
             result[country['iso3']] = country
         return result
 
+    def update_observation_ranking_type(self, obs, ranking_type):
+        self._db['observations'].update({'_id': obs.id}, {"$set": {'ranking_type': ranking_type}},
+                                        upsert=False)
 
-
-    def normalize_plain_observation(self, area_iso3_code=None, indicator_code=None, year_literal=None,
-                                    normalized_value=None, computation_type=None):
-        observation = self.find_observations(indicator_code=indicator_code, area_code=area_iso3_code, year=year_literal)
-        if observation["success"] and len(observation["data"]) > 0:
-            observation = observation["data"][0]
-            if computation_type is None:
-                computation_type = "normalized"
-            observation[computation_type] = normalized_value
-            if computation_type == 'scored':
-                observation['values'] = [round(normalized_value, 2)]
-            self._db['observations'].update({'_id': observation["_id"]}, {"$set": observation}, upsert=False)
 
 
     # @staticmethod
@@ -694,7 +685,6 @@ class ObservationDocumentAdapter(object):
                                   provider_name=observation_document['provider_name'],
                                   id=observation_document['_id'],
                                   continent=observation_document['continent'],
-                                  tendency=observation_document['tendency'],
                                   republish=observation_document['republish'],
                                   area_type=observation_document['area_type'],)
 
