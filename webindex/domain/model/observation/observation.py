@@ -48,6 +48,8 @@ class Observation(Entity):
         self._tendency = event.tendency
         self._republish = event.republish
         self._area_type = event.area_type
+        self._ranking = event.ranking
+        self._ranking_type = event.ranking_type
 
     def __repr__(self):
         return "{d}Observation(id={id!r}, " \
@@ -69,7 +71,7 @@ class Observation(Entity):
             'short_name': self.short_name, 'area': self.area, 'area_name': self.area_name, 'uri': self.uri,
             'value': self.value, 'year': self.year, 'provider_name': self.provider_name, 'id': self.id,
             'continent': self.continent, 'tendency': self.tendency, 'republish': self.republish,
-            'area_type': self.area_type
+            'area_type': self.area_type, 'ranking': self.ranking, 'ranking_type': self.ranking_type
         }
 
     # =======================================================================================
@@ -215,6 +217,24 @@ class Observation(Entity):
         self._area_type = area_type
         self.increment_version()
 
+    @property
+    def ranking(self):
+        return self._ranking
+
+    @ranking.setter
+    def ranking(self, ranking):
+        self._ranking = ranking
+        self.increment_version()
+
+    @property
+    def ranking_type(self):
+        return self._ranking_type
+
+    @ranking_type.setter
+    def ranking_type(self, ranking_type):
+        self._ranking_type = ranking_type
+        self.increment_version()
+
     # =======================================================================================
     # Commands
     # =======================================================================================
@@ -280,13 +300,14 @@ class Observation(Entity):
 def create_observation(provider_url=None, indicator=None, indicator_name=None,
                        short_name=None, area=None, area_name=None, uri=None, value=0,
                        year="1970", provider_name=None, id=None, continent=None,
-                       tendency=0, republish=False, area_type=None):
+                       tendency=0, republish=False, area_type=None, ranking=None, ranking_type=None):
     obs_id = uuid.uuid4().hex[:24]
     event = Observation.Created(originator_id=obs_id, originator_version=0,
                                 provider_url=provider_url, indicator=indicator, indicator_name=indicator_name,
                                 short_name=short_name, area=area, area_name=area_name,
                                 uri=uri, value=value, year=year, provider_name=provider_name, id=id,
-                                continent=continent, tendency=tendency, republish=republish, area_type=area_type)
+                                continent=continent, tendency=tendency, republish=republish, area_type=area_type,
+                                ranking=ranking, ranking_type=ranking_type)
     obs = when(event)
     publish(event)
     return obs
