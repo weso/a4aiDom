@@ -686,7 +686,9 @@ class ObservationDocumentAdapter(object):
                                   id=observation_document['_id'],
                                   continent=observation_document['continent'],
                                   republish=observation_document['republish'],
-                                  area_type=observation_document['area_type'],)
+                                  area_type=observation_document['area_type'],
+                                  ranking=observation_document['ranking'],
+                                  ranking_type=observation_document['ranking_type'])
 
     def transform_to_observation_list(self, observation_document_list):
         return [self.transform_to_observation(observation_document)
