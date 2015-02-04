@@ -121,7 +121,7 @@ class AreaRepository(area.Repository):
 
         return CountryDocumentAdapter().transform_to_country_list(country_list)
 
-    def find_areas(self, order="name"):
+    def find_areas(self, order):
         """
         Finds all areas in the repository
 
@@ -131,12 +131,13 @@ class AreaRepository(area.Repository):
         Returns:
             list of Area: All regions and countries
         """
+        order = "name" if order is None else order
         continents = self.find_continents(order)
         countries = self.find_countries(order)
 
         return continents + countries
 
-    def find_continents(self, order="name"):
+    def find_continents(self, order):
         """
         Finds all regions in the repository
 
@@ -146,6 +147,7 @@ class AreaRepository(area.Repository):
         Returns:
             list of Region: All regions
         """
+        order = "name" if order is None else order
         areas = self._db['areas'].find({"area": None}).sort(order, 1)
         continents = []
 
@@ -158,7 +160,7 @@ class AreaRepository(area.Repository):
 
         return RegionDocumentAdapter().transform_to_region_list(continents)
 
-    def find_countries(self, order="name"):
+    def find_countries(self, order):
         """
         Finds all countries in the repository
 
@@ -168,6 +170,7 @@ class AreaRepository(area.Repository):
         Returns:
             list of Country: All countries
         """
+        order = "name" if order is None else order
         countries = self._db['areas'].find({"area": {"$ne": None}}).sort(order, 1)
         country_list = []
 
