@@ -11,14 +11,33 @@ from utils import error, uri
 
 
 class AreaRepository(area.Repository):
-    """Concrete mongodb repository for Areas.
+    """
+    Concrete mongodb repository for Areas.
     """
 
     def __init__(self, url_root):
+        """
+        Constructor for AreaRepository
+
+        Args:
+            url_root (str): URL root where service is deployed, it will be used to compose URIs on areas
+        """
         self._db = connect_to_db(host=host, port=port, db_name=db_name)
         self._url_root = url_root
 
     def find_by_name(self, area_name):
+        """
+        Finds one area by its name
+
+        Args:
+            area_name (str): Name of the area to query, case insensitive
+
+        Return:
+            Area: The first area with the given name
+
+        Raises:
+            AreaRepositoryError: If there is not an area with the given name
+        """
         area = self._db['areas'].find_one({"$or": [
             {"name": area_name},
             {"name": area_name.upper()},
@@ -31,6 +50,19 @@ class AreaRepository(area.Repository):
         return AreaDocumentAdapter().transform_to_area(area)
 
     def find_countries_by_code_or_income(self, area_code_or_income):
+        """
+        Finds countries by code or income if no area is found it will search by income
+
+        Args:
+            area_code_or_income (str): iso3, iso2, name or income(for a list of countries)
+
+        Returns:
+            Region with the given countries appended or a list of countries
+
+        Raises:
+            AreaRepositoryError: If not countries nor areas are found
+
+        """
         area_code_or_income_upper = area_code_or_income.upper()
         area = self._db['areas'].find_one({"$or": [
             {"iso3": area_code_or_income},
@@ -55,9 +87,22 @@ class AreaRepository(area.Repository):
         return AreaDocumentAdapter().transform_to_area(area)
 
     def find_countries_by_continent_or_income_or_type(self, continent_or_income_or_type, order="iso3"):
+        """
+        Finds a list of countries by its continent, income or type
+
+        Args:
+            continent_or_income_or_type (str): Code for continent, income or type
+            order (str, optional): Attribute key to sort, default to iso3
+
+        Returns:
+            list of Country: countries with the given continent, income or type
+
+        Raises:
+            AreaRepositoryCountry: If no countries are found
+        """
         order = "name" if order is None else order
         continent_or_income_or_type_upper = continent_or_income_or_type.upper()
-        continent_or_income_or_type_title = continent_or_income_or_type.title()  # Nowadays this is the way it
+        continent_or_income_or_type_title = continent_or_income_or_type.title()  # Nowadays, this is the way it
                                                                                  # is stored
         countries = self._db['areas'].find({"$or": [
             {"area": continent_or_income_or_type},
@@ -74,18 +119,33 @@ class AreaRepository(area.Repository):
             self.area_uri(country)
             country_list.append(country)
 
-        #return success(country_list)
         return CountryDocumentAdapter().transform_to_country_list(country_list)
 
-    def find_areas(self, order):
-        order = "name" if order is None else order
+    def find_areas(self, order="name"):
+        """
+        Finds all areas in the repository
+
+        Args:
+            order (str): Attribute of Area to sort by
+
+        Returns:
+            list of Area: All regions and countries
+        """
         continents = self.find_continents(order)
         countries = self.find_countries(order)
 
         return continents + countries
 
-    def find_continents(self, order):
-        order = "name" if order is None else order
+    def find_continents(self, order="name"):
+        """
+        Finds all regions in the repository
+
+        Args:
+            order (str): Attribute of Region to sort by
+
+        Returns:
+            list of Region: All regions
+        """
         areas = self._db['areas'].find({"area": None}).sort(order, 1)
         continents = []
 
@@ -98,8 +158,16 @@ class AreaRepository(area.Repository):
 
         return RegionDocumentAdapter().transform_to_region_list(continents)
 
-    def find_countries(self, order):
-        order = "name" if order is None else order
+    def find_countries(self, order="name"):
+        """
+        Finds all countries in the repository
+
+        Args:
+            order (str): Attribute of Country to sort by
+
+        Returns:
+            list of Country: All countries
+        """
         countries = self._db['areas'].find({"area": {"$ne": None}}).sort(order, 1)
         country_list = []
 
@@ -107,10 +175,18 @@ class AreaRepository(area.Repository):
             self.area_uri(country)
             country_list.append(country)
 
-        #return success(country_list)
         return CountryDocumentAdapter().transform_to_country_list(country_list)
 
     def set_continent_countries(self, area):
+        """
+        Sets the countries that belong to a region
+
+        Args:
+            area (str): Area name
+
+        Returns:
+
+        """
         iso3 = area["iso3"]
         countries = self._db['areas'].find({"area": iso3}).sort("name", 1)
         country_list = []
@@ -122,17 +198,32 @@ class AreaRepository(area.Repository):
         if countries.count() > 0:
             area["countries"] = country_list
 
-    def area_error(self, area_code):
-        return error("Invalid Area Code: %s" % area_code)
-
     def area_uri(self, area):
+        """
+        Sets the URI to the given area
+
+        Args:
+            area (Area): Area to set the URI
+        """
         field = "iso3" if area["iso3"] is not None else "name"
         uri(url_root=self._url_root, element=area, element_code=field,
             level="areas")
 
 
 class CountryDocumentAdapter(object):
+    """
+    Adapter class to transform countries from PyMongo format to Domain country objects
+    """
     def transform_to_country(self, country_document):
+        """
+        Transforms one single country
+
+        Args:
+            country_document (dict): Country document in PyMongo format
+
+        Returns:
+            Country: A country object with the data in country_document
+        """
         return create_country(name=country_document['name'], short_name=country_document['short_name'],
                               area=country_document['area'], uri=country_document['uri'],
                               iso3=country_document['iso3'], iso2=country_document['iso2'],
@@ -141,11 +232,32 @@ class CountryDocumentAdapter(object):
                               search=country_document['search'])
 
     def transform_to_country_list(self, country_document_list):
+        """
+        Transforms a list of countries
+
+        Args:
+            country_document_list (dict): Country document list in PyMongo format
+
+        Returns:
+            list of Country: A list of countries with the data in country_document_list
+        """
         return [self.transform_to_country(country_document) for country_document in country_document_list]
 
 
 class RegionDocumentAdapter(object):
+    """
+    Adapter class to transform regions from PyMongo format to Domain region objects
+    """
     def transform_to_region(self, region_document):
+        """
+        Transforms one single region
+
+        Args:
+            region_document (dict): Region document in PyMongo format
+
+        Returns:
+            Region: A region object with the data in region_document
+        """
         return create_region(name=region_document['name'], short_name=region_document['short_name'],
                              area=region_document['area'], uri=region_document['uri'],
                              iso3=region_document['iso3'], iso2=region_document['iso2'],
@@ -154,15 +266,45 @@ class RegionDocumentAdapter(object):
                              countries=CountryDocumentAdapter().transform_to_country_list(region_document['countries']))
 
     def transform_to_region_list(self, region_document_list):
+        """
+        Transforms a list of regions
+
+        Args:
+            region_document_list (dict): Regions document list in PyMongo format
+
+        Returns:
+            list of Region: A list of regions with the data in region_document_list
+        """
         return [self.transform_to_region(region_document) for region_document in region_document_list]
 
 
 class AreaDocumentAdapter(object):
+    """
+    Adapter class to transform areas from PyMongo format to Domain region or country objects
+    """
     def transform_to_area(self, area_document):
+        """
+        Transforms one single area
+
+        Args:
+            area_document (dict): Area document in PyMongo format
+
+        Returns:
+            A region or country object, depending on the type
+        """
         if 'countries' in area_document:
             return RegionDocumentAdapter().transform_to_region(area_document)
         else:
             return CountryDocumentAdapter().transform_to_country(area_document)
 
     def transform_to_area_list(self, area_document_list):
+        """
+        Transforms a list of areas
+
+        Args:
+            area_document_list (dict): Areas document list in PyMongo format
+
+        Returns:
+            A list of regions or countries, depending on the type
+        """
         return [self.transform_to_area(area_document) for area_document in area_document_list]

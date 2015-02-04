@@ -10,7 +10,12 @@ from utility.mutators import when, mutate
 
 
 class Region(Area):
-    """ Region aggregate root entity"""
+    """
+    Region aggregate root entity
+
+    Attributes:
+        countries (list of Country): List of countries that belong to this region
+    """
     class Created(Entity.Created):
         pass
 
@@ -21,6 +26,15 @@ class Region(Area):
         pass
 
     def __init__(self, event):
+        """
+        Constructor for Region
+
+        Note:
+            New regions should be created by create_region factory function
+
+        Args:
+            event: Event with the required attributes
+        """
         super(Region, self).__init__(event)
         self._countries = event.countries
 
@@ -47,6 +61,12 @@ class Region(Area):
         self.increment_version()
 
     def add_country(self, country):
+        """
+        Add a country to this region
+
+        Args:
+            country (Country): country to be added to this region
+        """
         self._countries.append(country)
         self.increment_version()
 
@@ -104,6 +124,21 @@ class Region(Area):
 # =======================================================================================
 def create_region(name=None, short_name=None, area=None, countries=[],
                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, search=None):
+    """
+    This function creates new regions and acts as a factory
+
+    Args:
+        name (str, optional): Name for the region
+        short_name (str, optional): Short name for the region, could be the same as name
+        area (str, optional): Area where this region belongs to, e.g.: Europe and Asia for Europe
+        countries (list of Country, optional): List of countries that belong to this region
+        uri (str, optional): URI that identifies this unique resource, normally composed depending on deployment address
+        iso3 (str, optional): ISO 3166-1 alpha-3 code for the country
+        iso2 (str, optional): ISO 3166-1 alpha-2 code for the country
+        iso_num (str, optional): ISO 3166-1 number code for the country
+        id (optional): Id code for the country
+        search (str, optional): Search names separated by ';' with the name of the country in various languages
+    """
     region_id = uuid.uuid4().hex[:24]
     event = Region.Created(originator_id=region_id, originator_version=0,
                            name=name, short_name=short_name, area=area,

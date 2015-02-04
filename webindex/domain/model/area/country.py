@@ -9,7 +9,13 @@ from webindex.domain.model.entity import Entity
 
 
 class Country(Area):
-    """ Country entity """
+    """
+    Country entity
+
+    Attributes:
+        income (str): Income level, e.g.: LIC(Low income), LMC(Lower middle income), OEC(High income, OECD)
+        type (str): Type of development for the country e.g.: Developing, Emerging
+    """
     class Created(Entity.Created):
         pass
 
@@ -17,6 +23,15 @@ class Country(Area):
         pass
 
     def __init__(self, event):
+        """
+        Constructor for Country
+
+        Note:
+            New countries should be created by create_country factory function
+
+        Args:
+            event: Event with the required attributes
+        """
         super(Country, self).__init__(event)
         self._income = event.income
         self._type = event.type
@@ -28,6 +43,12 @@ class Country(Area):
                        type=self._type)
 
     def to_dict(self):
+        """
+        Converts self object to dictionary
+
+        Returns:
+            dict: Dictionary representation of self object
+        """
         dictionary = super(Country, self).to_dict()
         dictionary['income'] = self.income
         dictionary['type'] = self.type
@@ -77,8 +98,27 @@ class Country(Area):
 # =======================================================================================
 # Region aggregate root factory
 # =======================================================================================
-def create_country(name=None, short_name=None, area=None, income=[],
+def create_country(name=None, short_name=None, area=None, income=None,
                    uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None, search=None):
+    """
+    This function creates new countries and acts as a factory
+
+    Args:
+        name (str, optional): Name for the country
+        short_name (str, optional): Short name for the country, could be the same as name
+        area (str, optional): Area where this country belongs to, e.g.: Europe for Spain
+        income (str, optional): Income level, e.g.: LIC(Low income), LMC(Lower middle income), OEC(High income, OECD)
+        uri (str, optional): URI that identifies this unique resource, normally composed depending on deployment address
+        iso3 (str, optional): ISO 3166-1 alpha-3 code for the country
+        iso2 (str, optional): ISO 3166-1 alpha-2 code for the country
+        iso_num (str, optional): ISO 3166-1 number code for the country
+        id (optional): Id code for the country
+        type (str, optional): Type of development for the country e.g.: Developing, Emerging
+        search (str, optional): Search names separated by ';' with the name of the country in various languages
+
+    Returns:
+        country: Created country
+    """
     country_id = uuid.uuid4().hex[:24]
     event = Country.Created(originator_id=country_id, originator_version=0,
                             name=name, short_name=short_name, area=area,

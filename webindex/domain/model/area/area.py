@@ -8,7 +8,21 @@ from abc import ABCMeta, abstractmethod
 
 
 class Area(Entity):
-    """ Region aggregate root entity"""
+    """
+    Region aggregate root entity
+
+    Attributes:
+        name (str): Name for the country
+        short_name (str): Short name for the country, could be the same as name
+        area (str): Area where this country belongs to, e.g.: Europe for Spain
+        uri (str): URI that identifies this unique resource, normally composed depending on deployment address
+        iso3 (str): ISO 3166-1 alpha-3 code for the country
+        iso2 (str): ISO 3166-1 alpha-2 code for the country
+        iso_num (str): ISO 3166-1 number code for the country
+        id: Id code for the country
+        search (str): Search names separated by ';' with the name of the country in various languages
+    """
+
     class Created(Entity.Created):
         pass
 
@@ -19,6 +33,15 @@ class Area(Entity):
         pass
 
     def __init__(self, event):
+        """
+        Constructor for Area, creation of new objects should be done by create_country or create_region factory functions
+
+        Note:
+            New areas should be created by create_country or create_region functions
+
+        Args:
+            event: The event with the attributes required
+        """
         super(Area, self).__init__(event.originator_id, event.originator_version)
         self._name = event.name
         self._short_name = event.short_name
@@ -36,6 +59,12 @@ class Area(Entity):
                                             s=self, n=len(self._countries))
 
     def to_dict(self):
+        """
+        Converts self object to dictionary
+
+        Returns:
+            dict: Dictionary representation of self object
+        """
         return {
             'name': self.name, 'short_name': self.short_name, 'area': self.area,
             'uri': self.uri, 'iso3': self.iso3, 'iso2': self.iso2,
@@ -199,8 +228,6 @@ def _(event, region):
     return region
 
 
-
-
 # =======================================================================================
 # Area Repository
 # =======================================================================================
@@ -218,16 +245,13 @@ class Repository(object):
     def find_countries_by_continent_or_income_or_type(self, continent_or_income):
         pass
 
-    def find_continents(self):
+    def find_continents(self, order):
         pass
 
-    def find_countries(self):
+    def find_countries(self, order):
         pass
 
     def set_continent_countries(self, area):
-        pass
-
-    def area_error(self, area_code):
         pass
 
     def area_uri(self, area):
