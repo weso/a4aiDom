@@ -516,10 +516,10 @@ class ObservationRepository(Repository):
         return result
 
     def update_observation_ranking_type(self, obs, ranking_type):
-        self._db['observations'].update({'_id': obs.id}, {"$set": {'ranking_type': ranking_type}},
-                                        upsert=False)
+        self._db['observations'].update({'_id': obs.id}, {"$set": {'ranking_type': ranking_type}}, upsert=False)
 
-
+    def update_observation_ranking(self, obs, ranking):
+        self._db['observations'].update({'_id': obs.id}, {"$set": {'ranking': ranking}}, upsert=False)
 
     # @staticmethod
     # def _build_previous_value_object(value_previous_year, year, value_current_year):
