@@ -117,7 +117,7 @@ def create_country(name=None, short_name=None, area=None, income=None,
         search (str, optional): Search names separated by ';' with the name of the country in various languages
 
     Returns:
-        country: Created country
+        Country: Created country
     """
     country_id = uuid.uuid4().hex[:24]
     event = Country.Created(originator_id=country_id, originator_version=0,

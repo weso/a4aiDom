@@ -40,7 +40,7 @@ class Area(Entity):
             New areas should be created by create_country or create_region functions
 
         Args:
-            event: The event with the attributes required
+            event: The event with the required attributes
         """
         super(Area, self).__init__(event.originator_id, event.originator_version)
         self._name = event.name

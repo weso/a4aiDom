@@ -13,7 +13,23 @@ from webindex.domain.model.indicator.organization import Organization
 # Indicator aggregate root entity
 # =======================================================================================
 class Indicator(Entity):
-    """ Indicator aggregate root entity
+    """
+    Indicator aggregate root entity
+
+    Attributes:
+        id (str): Id for the indicator
+        index (str): Index to which this indicator belongs to
+        indicator (str): Indicator name, this is used to reference from other indicators
+        name (str): Indicator name, this is used as the long name so it could be longer and more complex than indicator
+        parent (str): Indicator name of the parent, this must reference indicator attribute of the parent indicator
+        provider_url (str): URL where data have been obtained
+        description (str): Description of the indicator
+        uri (str): URI that identifies this unique resource, normally composed depending on deployment address
+        subindex (str): Indicator name of the subindex that this indicator belongs to
+        type (str): Type of the indicator, normally one of: Index, SubIndex, Primary or Secondary
+        children (list of Indicator): Children that have this indicator as its parent
+        provider_name (str): Name of the provider where data have been obtained
+        republish (bool): If republish of this indicator data are allowed or not
     """
 
     class Created(Entity.Created):
@@ -26,6 +42,15 @@ class Indicator(Entity):
         pass
 
     def __init__(self, event):
+        """
+        Constructor for Indicator, creation of new objects should be done by create_indicator factory function
+
+        Note:
+            New indicators should be created by create_indicator function
+
+        Args:
+            event: The event with the required attributes
+        """
         super(Indicator, self).__init__(event.originator_id, event.originator_version)
         self._id = event.id
         self._index = event.index
@@ -55,6 +80,12 @@ class Indicator(Entity):
             format(d="*Discarded* " if self._discarded else "", id=self._id, i=self)
 
     def to_dict(self):
+        """
+        Converts self object to dictionary
+
+        Returns:
+            dict: Dictionary representation of self object
+        """
         return {
             'index': self.index, 'indicator': self.indicator, 'name': self.name,
             'parent': self.parent, 'provider_url': self.provider_url, 'description': self.description,
@@ -244,9 +275,30 @@ def create_indicator(id=None, index=None, indicator=None, name=None,
                      parent=None,
                      #component=None,
                      # weight=None,
-                     provider_name=None, republish=None,
+                     provider_name=None, republish=False,
                      # high_low=None,
                      subindex=None, type=None, children=[]):
+    """
+    This function creates new indicators and acts as a factory
+
+    Args:
+        id (str, optional): Id for the indicator
+        index (str, optional): Index to which this indicator belongs to
+        indicator (str, optional): Indicator name, this is used to reference from other indicators
+        name (str, optional): Indicator name, this is used as the long name so it could be longer and more complex than indicator
+        parent (str, optional): Indicator name of the parent, this must reference indicator attribute of the parent indicator
+        provider_url (str, optional): URL where data have been obtained
+        description (str, optional): Description of the indicator
+        uri (str, optional): URI that identifies this unique resource, normally composed depending on deployment address
+        subindex (str, optional): Indicator name of the subindex that this indicator belongs to
+        type (str, optional): Type of the indicator, normally one of: Index, SubIndex, Primary or Secondary
+        children (list of Indicator, optional): Children that have this indicator as its parent
+        provider_name (str, optional): Name of the provider where data have been obtained
+        republish (bool, optional): If republish of this indicator data are allowed or not
+
+    Returns:
+        Indicator: Created indicator
+    """
     indicator_id = uuid.uuid4().hex[:24]
     event = Indicator.Created(originator_id=indicator_id, originator_version=0,
                               id=id, index=index, indicator=indicator, name=name,
@@ -299,8 +351,6 @@ def _(event, indicator):
     return indicator
 
 
-
-
 # =======================================================================================
 # Indicator Repository
 # =======================================================================================
@@ -308,7 +358,7 @@ class Repository(object):
     """Abstract implementation of generic queries for managing indicators."""
     __metaclass__ = ABCMeta
 
-    def find_indicators_by_code(self, indicator_code):
+    def find_indicator_by_code(self, indicator_code):
         pass
 
     def find_indicators_index(self):

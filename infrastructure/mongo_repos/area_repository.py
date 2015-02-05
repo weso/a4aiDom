@@ -32,7 +32,7 @@ class AreaRepository(area.Repository):
         Args:
             area_name (str): Name of the area to query, case insensitive
 
-        Return:
+        Returns:
             Area: The first area with the given name
 
         Raises:
@@ -239,7 +239,7 @@ class CountryDocumentAdapter(object):
         Transforms a list of countries
 
         Args:
-            country_document_list (dict): Country document list in PyMongo format
+            country_document_list (list): Country document list in PyMongo format
 
         Returns:
             list of Country: A list of countries with the data in country_document_list
@@ -273,7 +273,7 @@ class RegionDocumentAdapter(object):
         Transforms a list of regions
 
         Args:
-            region_document_list (dict): Regions document list in PyMongo format
+            region_document_list (list): Region document list in PyMongo format
 
         Returns:
             list of Region: A list of regions with the data in region_document_list
@@ -305,7 +305,7 @@ class AreaDocumentAdapter(object):
         Transforms a list of areas
 
         Args:
-            area_document_list (dict): Areas document list in PyMongo format
+            area_document_list (list): Area document list in PyMongo format
 
         Returns:
             A list of regions or countries, depending on the type
