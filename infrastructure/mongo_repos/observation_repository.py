@@ -409,6 +409,10 @@ class ObservationRepository(Repository):
         if year is None:
             return None
 
+        if year == 'LATEST':
+            last_year = self.get_year_list()[0].value
+            return {"year": last_year}
+
         years = year.strip().split(",")
 
         year_list = []
@@ -436,7 +440,6 @@ class ObservationRepository(Repository):
                 "value": year
             })
 
-        #return success(year_list)
         return YearDocumentAdapter().transform_to_year_list(year_list)
 
     def get_year_array(self):
