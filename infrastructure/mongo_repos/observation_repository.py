@@ -15,7 +15,17 @@ from webindex.domain.model.observation.statistics import Statistics
 
 
 class ObservationRepository(Repository):
+    """
+    Concrete mongodb repository for Observations.
+    """
+
     def __init__(self, url_root):
+        """
+        Constructor for ObservationRepository
+
+        Args:
+            url_root (str): URL root where service is deployed, it will be used to compose URIs on areas
+        """
         self._db = connect_to_db(host=host, port=port, db_name=db_name)
         self._indicator = IndicatorRepository(url_root=url_root)
         self._area = AreaRepository(url_root=url_root)
@@ -291,6 +301,17 @@ class ObservationRepository(Repository):
         }
 
     def find_observations(self, indicator_code=None, area_code=None, year=None, area_type=None):
+        """
+        Returns all observations that satisfy the given filters
+
+        Args:
+            indicator_code (str, optional): The indicator code (indicator attribute in Indicator)
+            area_code (str, optional): The area code for the observation
+            year (str, optional): The year when observation was observed
+            area_type (str, optional): The area type for the observation area
+        Returns:
+            list of Observation: Observation that satisfy the given filters
+        """
         filters = []
 
         if indicator_code is not None:
@@ -350,6 +371,15 @@ class ObservationRepository(Repository):
         return success([obs for obs in self._db['linked_observations'].find()])
 
     def get_indicators_by_code(self, code):
+        """
+        Returns an indicator mongodb filter to use in other queries
+
+        Args:
+            code (str): Indicator code or codes, for many indicator codes, divide them using a ','
+
+        Returns:
+            dict: The filter for mongodb queries
+        """
         codes = code.upper().strip().split(",")
 
         for code in codes:
@@ -362,6 +392,15 @@ class ObservationRepository(Repository):
         return {"indicator": {"$in": codes}}
 
     def get_countries_by_code_name_or_income(self, code):
+        """
+        Returns an area mongodb filter to use in other queries
+
+        Args:
+            code (str): Area code or area codes, divide them using a ','
+
+        Returns:
+            dict: The filter for mongodb queries
+        """
         codes = code.split(",")
 
         country_codes = []
@@ -406,6 +445,15 @@ class ObservationRepository(Repository):
         }
 
     def get_years(self, year):
+        """
+        Returns a year mongodb filter to use in other queries
+
+        Args:
+            year (str): Year, years or LATEST (last year with observations), divide them using a ','
+
+        Returns:
+            dict: The filter for mongodb queries
+        """
         if year is None:
             return None
 
@@ -430,6 +478,12 @@ class ObservationRepository(Repository):
         return {"year": {"$in": year_list}}
 
     def get_year_list(self):
+        """
+        Returns all years with observations
+
+        Returns:
+            list of Year: All years with observations
+        """
         years = self._db['observations'].distinct("year")
         years.sort(reverse = True)
 
@@ -456,6 +510,12 @@ class ObservationRepository(Repository):
     #                                                       indicator_code, area_code, year)
 
     def set_observation_country_and_indicator_name(self, observation):
+        """
+        Sets country an indicator name to the given observation
+
+        Args:
+            observation (dict): Observation in pymongo format
+        """
         indicator_code = observation["indicator"]
         area_code = observation["area"]
 
@@ -670,12 +730,35 @@ class ObservationRepository(Repository):
     #     return None
 
     def find_observations_statistics(self, indicator_code=None, area_code=None, year=None):
+        """
+        Returns statitics for observations that satisfy the given filters
+
+        Args:
+            indicator_code (str, optional): The indicator code (indicator attribute in Indicator)
+            area_code (str, optional): The area code for the observation
+            year (str, optional): The year when observation was observed
+            area_type (str, optional): The area type for the observation area
+        Returns:
+            list of Statistics: Observations statistics that satisfy the filters
+        """
         return StatisticsDocumentAdapter().transform_to_statistics(
             self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year))
 
 
 class ObservationDocumentAdapter(object):
+    """
+    Adapter class to transform observations from PyMongo format to Domain observations objects
+    """
     def transform_to_observation(self, observation_document):
+        """
+        Transforms one single observation
+
+        Args:
+            observation_document (dict): Observation document in PyMongo format
+
+        Returns:
+            Observation: Observation object with the data in observation_document
+        """
         return create_observation(provider_url=observation_document['provider_url'],
                                   indicator=observation_document['indicator'],
                                   indicator_name=observation_document['indicator_name'],
@@ -694,18 +777,60 @@ class ObservationDocumentAdapter(object):
                                   ranking_type=observation_document['ranking_type'])
 
     def transform_to_observation_list(self, observation_document_list):
+        """
+        Transforms a list observations
+
+        Args:
+            observation_document_list (list): Observation document list in PyMongo format
+
+        Returns:
+            Observation: A list of observations with the data in observation_document_list
+        """
         return [self.transform_to_observation(observation_document)
                 for observation_document in observation_document_list]
 
 
 class YearDocumentAdapter(object):
+    """
+    Adapter class to transform years from PyMongo format to Domain Year objects
+    """
     def transform_to_year(self, year_document):
+        """
+        Transforms one single year
+
+        Args:
+            year_document (dict): Year document in PyMongo format
+
+        Returns:
+            Year: Year object with the data in year_document
+        """
         return Year(value=year_document['value'])
 
     def transform_to_year_list(self, year_document_list):
+        """
+        Transforms a list of years
+
+        Args:
+            year_document_list (list): Year document list in PyMongo format
+
+        Returns:
+            list of Year: A list of years with the data in year_document_list
+        """
         return [self.transform_to_year(year_document) for year_document in year_document_list]
 
 
 class StatisticsDocumentAdapter(object):
+    """
+    Adapter class to transform observations from PyMongo format to Domain Statistics objects
+    """
     def transform_to_statistics(self, observations):
+        """
+        Transforms a list of observations into statistics
+
+        Args:
+            observations (list): Observation document list in PyMongo format
+
+        Returns:
+            Statistics: Statistics object with statistics data for the given observations
+        """
         return Statistics(observations)

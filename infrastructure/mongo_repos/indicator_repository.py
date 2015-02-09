@@ -16,7 +16,7 @@ class IndicatorRepository(Repository):
 
     def __init__(self, url_root):
         """
-        Constructor  for IndicatorRepository
+        Constructor for IndicatorRepository
 
         Args:
             url_root (str): URL root where service is deployed, it will be used to compose URIs on areas

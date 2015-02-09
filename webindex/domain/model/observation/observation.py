@@ -13,7 +13,27 @@ from abc import ABCMeta
 # Observation aggregate root entity
 # =======================================================================================
 class Observation(Entity):
-    """ Observation aggregate root entity
+    """
+    Observation aggregate root entity
+
+    Attributes:
+        provider_url (str): URL of the provider
+        indicator (str): Indicator indicator attribute value
+        indicator_name (str): Indicator name for this observation
+        short_name (str): Short name of the area
+        area (str): Area area attribute value
+        area_name (str): Name of the area
+        uri (str): URI for this observation
+        value (float or string): Value for this observation, could be blank if there is no valid value
+        year (str): Year for this observation
+        provider_name (str): Name of the observation provider
+        id (str): Id for this observations
+        continent (str): Continent for the area
+        tendency (int): Tendency regarding previous years, -1 decreasing, 0 equal, +1 increasing
+        republish (bool): True if republish is allowed, otherwise False
+        area_type (str): Area type, i.g.: EMERGING or DEVELOPING
+        ranking (int): Ranking for this observation
+        ranking_type (int): Ranking type for this observation
     """
 
     class Created(Entity.Created):
@@ -32,6 +52,15 @@ class Observation(Entity):
         pass
 
     def __init__(self, event):
+        """
+        Constructor for Observation, creation of new objects should be done by create_observation factory function
+
+        Note:
+            New observations should be created by create_observation function
+
+        Args:
+            event: The event with the required attributes
+        """
         super(Observation, self).__init__(event.originator_id, event.originator_version)
         self._provider_url = event.provider_url
         self._indicator = event.indicator
@@ -66,6 +95,12 @@ class Observation(Entity):
                    ref_year=self._ref_year)
 
     def to_dict(self):
+        """
+        Converts self object to dictionary
+
+        Returns:
+            dict: Dictionary representation of self object
+        """
         return {
             'provider_url': self.provider_url, 'indicator': self.indicator, 'indicator_name': self.indicator_name,
             'short_name': self.short_name, 'area': self.area, 'area_name': self.area_name, 'uri': self.uri,
@@ -301,6 +336,31 @@ def create_observation(provider_url=None, indicator=None, indicator_name=None,
                        short_name=None, area=None, area_name=None, uri=None, value=0,
                        year="1970", provider_name=None, id=None, continent=None,
                        tendency=0, republish=False, area_type=None, ranking=None, ranking_type=None):
+    """
+    This function creates new observations and acts as a factory
+
+    Args:
+        provider_url (str, optional): URL of the provider
+        indicator (str, optional): Indicator indicator attribute value
+        indicator_name (str, optional): Indicator name for this observation
+        short_name (str, optional): Short name of the area
+        area (str, optional): Area area attribute value
+        area_name (str, optional): Name of the area
+        uri (str, optional): URI for this observation
+        value (float or string, optional): Value for this observation, could be blank if there is no valid value
+        year (str, optional): Year for this observation
+        provider_name (str, optional): Name of the observation provider
+        id (str, optional): Id for this observations
+        continent (str, optional): Continent for the area
+        tendency (int, optional): Tendency regarding previous years, -1 decreasing, 0 equal, +1 increasing
+        republish (bool, optional): True if republish is allowed, otherwise False
+        area_type (str, optional): Area type, i.g.: EMERGING or DEVELOPING
+        ranking (int, optional): Ranking for this observation
+        ranking_type (int, optional): Ranking type for this observation
+
+    Returns:
+        Observation: Created observation
+    """
     obs_id = uuid.uuid4().hex[:24]
     event = Observation.Created(originator_id=obs_id, originator_version=0,
                                 provider_url=provider_url, indicator=indicator, indicator_name=indicator_name,
