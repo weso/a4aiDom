@@ -529,7 +529,7 @@ class ObservationRepository(Repository):
                            year_literal=None, area_name=None, area_code=None, indicator_name=None, previous_value=None,
                            year_of_previous_value=None, republish=True, provider_name="WF (Web Foundation)",
                            provider_url="http://webfoundation.org/", short_name=None, area_type=None,
-                           ranking=None, ranking_type=None):  # Refactor please...
+                           ranking=None, ranking_type=None, indicator_type=None):  # Refactor please...
         """
         It takes the info of indicator and area through the optional params area_iso3_code,
         indicator_code and year_literal
@@ -545,6 +545,7 @@ class ObservationRepository(Repository):
         observation_dict['area_name'] = area_name
         observation_dict['indicator'] = indicator_code
         observation_dict['indicator_name'] = indicator_name
+        observation_dict['indicator_type'] = indicator_type
         observation_dict['value'] = observation.value
         observation_dict['year'] = str(observation.year.value)
         observation_dict['uri'] = observation_uri
