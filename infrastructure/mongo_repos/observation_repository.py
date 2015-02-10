@@ -762,6 +762,7 @@ class ObservationDocumentAdapter(object):
         return create_observation(provider_url=observation_document['provider_url'],
                                   indicator=observation_document['indicator'],
                                   indicator_name=observation_document['indicator_name'],
+                                  indicator_type=observation_document['indicator_type'],
                                   short_name=observation_document['short_name'],
                                   area=observation_document['area'],
                                   area_name=observation_document['area_name'],

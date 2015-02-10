@@ -20,6 +20,7 @@ class Observation(Entity):
         provider_url (str): URL of the provider
         indicator (str): Indicator indicator attribute value
         indicator_name (str): Indicator name for this observation
+        indicator_type (str): Indicator type for this observation
         short_name (str): Short name of the area
         area (str): Area area attribute value
         area_name (str): Name of the area
@@ -65,6 +66,7 @@ class Observation(Entity):
         self._provider_url = event.provider_url
         self._indicator = event.indicator
         self._indicator_name = event.indicator_name
+        self._indicator_type = event.indicator_type
         self._short_name = event.short_name
         self._area = event.area
         self._area_name = event.area_name
@@ -103,7 +105,7 @@ class Observation(Entity):
         """
         return {
             'provider_url': self.provider_url, 'indicator': self.indicator, 'indicator_name': self.indicator_name,
-            'short_name': self.short_name, 'area': self.area, 'area_name': self.area_name, 'uri': self.uri,
+            'indicator_type': self.indicator_type, 'short_name': self.short_name, 'area': self.area, 'area_name': self.area_name, 'uri': self.uri,
             'value': self.value, 'year': self.year, 'provider_name': self.provider_name, 'id': self.id,
             'continent': self.continent, 'tendency': self.tendency, 'republish': self.republish,
             'area_type': self.area_type, 'ranking': self.ranking, 'ranking_type': self.ranking_type
@@ -138,6 +140,15 @@ class Observation(Entity):
     @indicator_name.setter
     def indicator_name(self, indicator_name):
         self._indicator_name = indicator_name
+        self.increment_version()
+
+    @property
+    def indicator_type(self):
+        return self._indicator_type
+
+    @indicator_type.setter
+    def indicator_type(self, indicator_type):
+        self._indicator_type = indicator_type
         self.increment_version()
 
     @property
@@ -332,7 +343,7 @@ class Observation(Entity):
 # =======================================================================================
 # Observation aggregate root factory
 # =======================================================================================
-def create_observation(provider_url=None, indicator=None, indicator_name=None,
+def create_observation(provider_url=None, indicator=None, indicator_name=None, indicator_type=None,
                        short_name=None, area=None, area_name=None, uri=None, value=0,
                        year="1970", provider_name=None, id=None, continent=None,
                        tendency=0, republish=False, area_type=None, ranking=None, ranking_type=None):
@@ -343,6 +354,7 @@ def create_observation(provider_url=None, indicator=None, indicator_name=None,
         provider_url (str, optional): URL of the provider
         indicator (str, optional): Indicator indicator attribute value
         indicator_name (str, optional): Indicator name for this observation
+        indicator_type (str): Indicator type for this observation
         short_name (str, optional): Short name of the area
         area (str, optional): Area area attribute value
         area_name (str, optional): Name of the area
@@ -364,7 +376,7 @@ def create_observation(provider_url=None, indicator=None, indicator_name=None,
     obs_id = uuid.uuid4().hex[:24]
     event = Observation.Created(originator_id=obs_id, originator_version=0,
                                 provider_url=provider_url, indicator=indicator, indicator_name=indicator_name,
-                                short_name=short_name, area=area, area_name=area_name,
+                                indicator_type=indicator_type, short_name=short_name, area=area, area_name=area_name,
                                 uri=uri, value=value, year=year, provider_name=provider_name, id=id,
                                 continent=continent, tendency=tendency, republish=republish, area_type=area_type,
                                 ranking=ranking, ranking_type=ranking_type)
