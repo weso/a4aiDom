@@ -1,3 +1,6 @@
+from webindex.domain.model.observation.grouped_by_area_visualisation import GroupedByAreaVisualisation
+from webindex.domain.model.observation.visualisation import Visualisation
+
 __author__ = 'guillermo'
 
 
@@ -738,12 +741,44 @@ class ObservationRepository(Repository):
             indicator_code (str, optional): The indicator code (indicator attribute in Indicator)
             area_code (str, optional): The area code for the observation
             year (str, optional): The year when observation was observed
-            area_type (str, optional): The area type for the observation area
         Returns:
             list of Statistics: Observations statistics that satisfy the filters
         """
         return StatisticsDocumentAdapter().transform_to_statistics(
             self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year))
+
+    def find_observations_visualisation(self, indicator_code=None, area_code=None, year=None):
+        """
+        Returns visualisation for observations that satisfy the given filters
+
+        Args:
+            indicator_code (str, optional): The indicator code (indicator attribute in Indicator)
+            area_code (str, optional): The area code for the observation
+            year (str, optional): The year when observation was observed
+        Returns:
+            Visualisation: Observations visualisation that satisfy the filters
+        """
+        return VisualisationDocumentAdapter().transform_to_visualisation(
+            self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year))
+
+    def find_observations_grouped_by_area_visualisation(self, indicator_code=None, area_code=None, year=None):
+        """
+        Returns grouped by area visualisation for observations that satisfy the given filters
+
+        Args:
+            indicator_code (str, optional): The indicator code (indicator attribute in Indicator)
+            area_code (str, optional): The area code for the observation
+            year (str, optional): The year when observation was observed
+        Returns:
+            GroupedByAreaVisualisation: Observations grouped by area visualisation that satisfy the filters
+        """
+        area_code_splitted = area_code.split(',') if area_code is not None else None
+        observations = self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year)
+
+        return GroupedByAreaVisualisationDocumentAdapter().transform_to_grouped_by_area_visualisation(
+            area_codes=area_code_splitted,
+            observations=observations
+        )
 
 
 class ObservationDocumentAdapter(object):
@@ -836,3 +871,38 @@ class StatisticsDocumentAdapter(object):
             Statistics: Statistics object with statistics data for the given observations
         """
         return Statistics(observations)
+
+
+class VisualisationDocumentAdapter(object):
+    """
+    Adapter class to transform observations from PyMongo format to Domain Visualisation objects
+    """
+    def transform_to_visualisation(self, observations):
+        """
+        Transforms a list of observations into visualisation
+
+        Args:
+            observations (list of Observation): Observation list
+
+        Returns:
+            Visualisation: Visualisation object for the given observations
+        """
+        return Visualisation(observations)
+
+
+class GroupedByAreaVisualisationDocumentAdapter(object):
+    """
+    Adapter class to transform observations from PyMongo format to Domain GroupedByAreaVisualisation objects
+    """
+    def transform_to_grouped_by_area_visualisation(self, area_codes, observations):
+        """
+        Transforms a list of observations into GroupedByAreaVisualisation
+
+        Args:
+            area_codes (list of str): Iso3 codes for the area to group by
+            observations (list of Observation): Observation list
+
+        Returns:
+            GroupedByAreaVisualisation: GroupedByAreaVisualisation object for the given observations
+        """
+        return GroupedByAreaVisualisation(area_codes, observations)
