@@ -30,6 +30,7 @@ class Indicator(Entity):
         children (list of Indicator): Children that have this indicator as its parent
         provider_name (str): Name of the provider where data have been obtained
         republish (bool): If republish of this indicator data are allowed or not
+        is_percentage (bool): If the value is a percentage or not
     """
 
     class Created(Entity.Created):
@@ -67,6 +68,7 @@ class Indicator(Entity):
         self._children = event.children
         self._provider_name = event.provider_name
         self._republish = event.republish
+        self._is_percentage = event.is_percentage
         #self._high_low = event.high_low
 
     def __repr__(self):
@@ -95,7 +97,7 @@ class Indicator(Entity):
             'subindex': self.subindex,
             'id': self.id, 'type': self.type, 'children': [child.to_dict() for child in self.children],
             #'high_low': self._high_low,
-            'provider_name': self.provider_name, 'republish': self.republish
+            'provider_name': self.provider_name, 'republish': self.republish, 'is_percentage': self.is_percentage
         }
 
     # =======================================================================================
@@ -227,12 +229,12 @@ class Indicator(Entity):
         self.increment_version()
 
     @property
-    def high_low(self):
-        return self._high_low
+    def is_percentage(self):
+        return self._is_percentage
 
-    @high_low.setter
-    def high_low(self, high_low):
-        self._high_low = high_low
+    @is_percentage.setter
+    def is_percentage(self, is_percentage):
+        self._is_percentage = is_percentage
         self.increment_version()
 
     # =======================================================================================
@@ -275,7 +277,7 @@ def create_indicator(id=None, index=None, indicator=None, name=None,
                      parent=None,
                      #component=None,
                      # weight=None,
-                     provider_name=None, republish=False,
+                     provider_name=None, republish=False, is_percentage=False,
                      # high_low=None,
                      subindex=None, type=None, children=[]):
     """
@@ -295,6 +297,7 @@ def create_indicator(id=None, index=None, indicator=None, name=None,
         children (list of Indicator, optional): Children that have this indicator as its parent
         provider_name (str, optional): Name of the provider where data have been obtained
         republish (bool, optional): If republish of this indicator data are allowed or not
+        is_percentage (bool): If the value is a percentage or not
 
     Returns:
         Indicator: Created indicator
@@ -309,6 +312,7 @@ def create_indicator(id=None, index=None, indicator=None, name=None,
                               #weight=weight,
                               provider_name=provider_name, republish=republish,
                               subindex=subindex, type=type, children=children,
+                              is_percentage=is_percentage
                               #high_low=high_low
                               )
     indicator = when(event)
