@@ -21,7 +21,7 @@ class GroupedByAreaVisualisation(object):
 
     def observation_by_area(self, area_code):
         """
-        Returns observations of a area code
+        Returns observations of an area code
 
         Args:
             area_code (str): Iso3 code for the area to filter
@@ -40,7 +40,7 @@ class GroupedByAreaVisualisation(object):
             dict: Dictionary representation of self object
         """
         dict = {}
-        if self._area_codes is None or len(self._area_codes) == 0:
+        if self._area_codes is None or len(self._area_codes) == 0 or self._area_codes[0] == 'ALL':
             dict['ALL'] = \
                     Visualisation(observations=self._observations).to_dict()
         else:
