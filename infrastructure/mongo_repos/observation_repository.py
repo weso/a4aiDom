@@ -758,8 +758,10 @@ class ObservationRepository(Repository):
         Returns:
             Visualisation: Observations visualisation that satisfy the filters
         """
-        return VisualisationDocumentAdapter().transform_to_visualisation(
-            self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year))
+        observations = self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year)
+        observations_all_areas = self.find_observations(indicator_code=indicator_code, area_code='ALL', year=year)
+
+        return VisualisationDocumentAdapter().transform_to_visualisation(observations, observations_all_areas)
 
     def find_observations_grouped_by_area_visualisation(self, indicator_code=None, area_code=None, year=None):
         """
@@ -774,10 +776,12 @@ class ObservationRepository(Repository):
         """
         area_code_splitted = area_code.split(',') if area_code is not None else None
         observations = self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year)
+        observations_all_areas = self.find_observations(indicator_code=indicator_code, area_code='ALL', year=year)
 
         return GroupedByAreaVisualisationDocumentAdapter().transform_to_grouped_by_area_visualisation(
             area_codes=area_code_splitted,
-            observations=observations
+            observations=observations,
+            observations_all_areas=observations_all_areas
         )
 
 
@@ -877,32 +881,34 @@ class VisualisationDocumentAdapter(object):
     """
     Adapter class to transform observations from PyMongo format to Domain Visualisation objects
     """
-    def transform_to_visualisation(self, observations):
+    def transform_to_visualisation(self, observations, observations_all_areas):
         """
         Transforms a list of observations into visualisation
 
         Args:
             observations (list of Observation): Observation list
+            observations_all_areas (list of Observation): Observations list with all areas without filter applied
 
         Returns:
             Visualisation: Visualisation object for the given observations
         """
-        return Visualisation(observations)
+        return Visualisation(observations, observations_all_areas)
 
 
 class GroupedByAreaVisualisationDocumentAdapter(object):
     """
     Adapter class to transform observations from PyMongo format to Domain GroupedByAreaVisualisation objects
     """
-    def transform_to_grouped_by_area_visualisation(self, area_codes, observations):
+    def transform_to_grouped_by_area_visualisation(self, area_codes, observations, observations_all_areas):
         """
         Transforms a list of observations into GroupedByAreaVisualisation
 
         Args:
             area_codes (list of str): Iso3 codes for the area to group by
             observations (list of Observation): Observation list
+            observations_all_areas (list of Observation): Observations list with all areas without filter applied
 
         Returns:
             GroupedByAreaVisualisation: GroupedByAreaVisualisation object for the given observations
         """
-        return GroupedByAreaVisualisation(area_codes, observations)
+        return GroupedByAreaVisualisation(area_codes, observations, observations_all_areas)
