@@ -239,6 +239,7 @@ class IndicatorDocumentAdapter(object):
                          provider_name=indicator_document['provider_name'],
                          republish=indicator_document['republish'],
                          children=self.transform_to_indicator_list(indicator_document['children']),
+                         is_percentage=indicator_document['is_percentage']
                          #high_low=indicator_document['high_low'] if 'high_low' in indicator_document else None
                          )
 
