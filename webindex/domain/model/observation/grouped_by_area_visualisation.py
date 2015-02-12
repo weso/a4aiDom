@@ -1,3 +1,5 @@
+from webindex.domain.model.observation.statistics import Statistics
+
 __author__ = 'Herminio'
 
 from webindex.domain.model.observation.visualisation import Visualisation
@@ -8,16 +10,19 @@ class GroupedByAreaVisualisation(object):
     GroupedByAreaVisualisation entity
     """
 
-    def __init__(self, area_codes, observations):
+    def __init__(self, area_codes, observations, observations_all_areas):
         """
         Constructor for GroupedByAreaVisualisation
 
         Args:
             area_codes (list of str): Iso3 codes for the areas to group by
             observations (list of Observation): Observations to filter by area
+            observations_all_areas (list of Observation): All observations without area filters
         """
         self._area_codes = area_codes
         self._observations = observations
+        self._observations_all_areas = observations_all_areas
+        self._statistics_all_areas = Statistics(observations_all_areas)
 
     def observation_by_area(self, area_code):
         """
@@ -39,12 +44,14 @@ class GroupedByAreaVisualisation(object):
         Returns:
             dict: Dictionary representation of self object
         """
-        dict = {}
+        dict = {
+            'statistics_all_areas': self._statistics_all_areas.to_dict()
+        }
         if self._area_codes is None or len(self._area_codes) == 0 or self._area_codes[0] == 'ALL':
             dict['ALL'] = \
-                    Visualisation(observations=self._observations).to_dict()
+                    Visualisation(observations=self._observations).to_dict_without_all_areas()
         else:
             for area_code in self._area_codes:
                 dict[area_code] = \
-                    Visualisation(observations=self.observation_by_area(area_code)).to_dict()
+                    Visualisation(observations=self.observation_by_area(area_code)).to_dict_without_all_areas()
         return dict
