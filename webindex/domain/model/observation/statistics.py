@@ -12,6 +12,8 @@ class Statistics(object):
         average_emerging (float): Average value for emerging areas observations
         median_developing (float): Median value for developing areas observations
         median_emerging (float): Median value for emerging areas observations
+        max (float): Max value for given observations
+        min (float): Min value for given observations
     """
     DEVELOPING = "Developing"
     EMERGING = "Emerging"
@@ -50,6 +52,14 @@ class Statistics(object):
     @property
     def median_emerging(self):
         return self._median(self._filter_observations_values_by_area_type(self.EMERGING))
+
+    @property
+    def max(self):
+        return max(self._observations, key=lambda obs: obs.value).value
+
+    @property
+    def min(self):
+        return min(self._observations, key=lambda obs: obs.value).value
 
     def _average(self, values):
         """
@@ -131,5 +141,7 @@ class Statistics(object):
             'average_developing': self.average_developing,
             'median_developing': self.median_developing,
             'average_emerging': self.average_emerging,
-            'median_emerging': self.median_emerging
+            'median_emerging': self.median_emerging,
+            'max': self.max,
+            'min': self.min
         }
