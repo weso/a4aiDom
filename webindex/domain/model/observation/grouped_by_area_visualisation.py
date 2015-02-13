@@ -47,11 +47,7 @@ class GroupedByAreaVisualisation(object):
         dict = {
             'statistics_all_areas': self._statistics_all_areas.to_dict()
         }
-        if self._area_codes is None or len(self._area_codes) == 0 or self._area_codes[0] == 'ALL':
-            dict['ALL'] = \
-                    Visualisation(observations=self._observations).to_dict_without_all_areas()
-        else:
-            for area_code in self._area_codes:
-                dict[area_code] = \
-                    Visualisation(observations=self.observation_by_area(area_code)).to_dict_without_all_areas()
+        for area_code in self._area_codes:
+            dict[area_code] = \
+                Visualisation(observations=self.observation_by_area(area_code)).to_dict_without_all_areas()
         return dict
