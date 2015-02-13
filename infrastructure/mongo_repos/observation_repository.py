@@ -777,6 +777,9 @@ class ObservationRepository(Repository):
         area_code_splitted = area_code.split(',') if area_code is not None else None
         observations = self.find_observations(indicator_code=indicator_code, area_code=area_code, year=year)
         observations_all_areas = self.find_observations(indicator_code=indicator_code, area_code='ALL', year=year)
+        if area_code_splitted is None or len(area_code_splitted) == 0 or area_code == 'ALL':
+            areas = AreaRepository(url_root=self._url_root).find_countries(order="iso3")
+            area_code_splitted = [area.iso3 for area in areas]
 
         return GroupedByAreaVisualisationDocumentAdapter().transform_to_grouped_by_area_visualisation(
             area_codes=area_code_splitted,
