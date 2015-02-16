@@ -230,7 +230,7 @@ class AreaRepository(area.Repository):
                 "value": indicator.value,
                 "provider": {
                     "name": indicator.provider_name,
-                    "url": indicator.provider_value
+                    "url": indicator.provider_url
                 }
             }
 
