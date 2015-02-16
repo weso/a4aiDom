@@ -55,11 +55,11 @@ class Statistics(object):
 
     @property
     def max(self):
-        return max(self._observations, key=lambda obs: obs.value).value
+        return max(self._observations_values())
 
     @property
     def min(self):
-        return min(self._observations, key=lambda obs: obs.value).value
+        return min(self._observations_values())
 
     def _average(self, values):
         """
