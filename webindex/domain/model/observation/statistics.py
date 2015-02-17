@@ -55,11 +55,11 @@ class Statistics(object):
 
     @property
     def max(self):
-        return max(self._observations_values())
+        return max(self._observations_values()) if len(self._observations_values()) > 0 else 0
 
     @property
     def min(self):
-        return min(self._observations_values())
+        return min(self._observations_values()) if len(self._observations_values()) > 0 else 0
 
     def _average(self, values):
         """
