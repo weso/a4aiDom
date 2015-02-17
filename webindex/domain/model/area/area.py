@@ -21,6 +21,7 @@ class Area(Entity):
         iso_num (str): ISO 3166-1 number code for the country
         id: Id code for the country
         search (str): Search names separated by ';' with the name of the country in various languages
+        info (list of AreaInfo): List of area info for this area
     """
 
     class Created(Entity.Created):
@@ -52,6 +53,7 @@ class Area(Entity):
         self._iso_num = event.iso_num
         self._id = event.id
         self._search = event.search
+        self._info = event.info
 
     def __repr__(self):
         return "{d}Region(id={s._id}, type={s._type}, label={s._label}, " \
@@ -68,7 +70,8 @@ class Area(Entity):
         return {
             'name': self.name, 'short_name': self.short_name, 'area': self.area,
             'uri': self.uri, 'iso3': self.iso3, 'iso2': self.iso2,
-            'iso_num': self.iso_num, 'id': self.id, "search": self.search
+            'iso_num': self.iso_num, 'id': self.id, "search": self.search,
+            'info': {area_info.indicator_code: area_info.to_dict() for area_info in self.info}
         }
 
 # =======================================================================================
@@ -157,6 +160,15 @@ class Area(Entity):
     @search.setter
     def search(self, search):
         self._search = search
+        self.increment_version()
+
+    @property
+    def info(self):
+        return self._info
+
+    @info.setter
+    def info(self, info):
+        self.info = info
         self.increment_version()
 
 # =======================================================================================
