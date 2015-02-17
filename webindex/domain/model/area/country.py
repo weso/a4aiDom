@@ -99,7 +99,8 @@ class Country(Area):
 # Region aggregate root factory
 # =======================================================================================
 def create_country(name=None, short_name=None, area=None, income=None,
-                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None, search=None):
+                   uri=None, iso3=None, iso2=None, iso_num=None, id=None, type=None, search=None,
+                   info=[]):
     """
     This function creates new countries and acts as a factory
 
@@ -115,6 +116,7 @@ def create_country(name=None, short_name=None, area=None, income=None,
         id (optional): Id code for the country
         type (str, optional): Type of development for the country e.g.: Developing, Emerging
         search (str, optional): Search names separated by ';' with the name of the country in various languages
+        info (list of AreaInfo): List of area info for this area
 
     Returns:
         Country: Created country
@@ -123,7 +125,8 @@ def create_country(name=None, short_name=None, area=None, income=None,
     event = Country.Created(originator_id=country_id, originator_version=0,
                             name=name, short_name=short_name, area=area,
                             income=income, uri=uri, iso3=iso3, iso2=iso2,
-                            iso_num=iso_num, id=id, type=type, search=search)
+                            iso_num=iso_num, id=id, type=type, search=search,
+                            info=info)
     country = when(event)
     publish(event)
     return country

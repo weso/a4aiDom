@@ -1,3 +1,4 @@
+from webindex.domain.model.area.area_info import AreaInfo
 
 __author__ = 'guillermo'
 
@@ -251,12 +252,15 @@ class CountryDocumentAdapter(object):
         Returns:
             Country: A country object with the data in country_document
         """
+        info=AreaInfoDocumentAdapter().transform_to_area_info_list(country_document['info'])\
+                if 'info' in country_document else []
         return create_country(name=country_document['name'], short_name=country_document['short_name'],
                               area=country_document['area'], uri=country_document['uri'],
                               iso3=country_document['iso3'], iso2=country_document['iso2'],
                               iso_num=country_document['iso_num'], income=country_document['income'],
                               id=country_document['_id'], type=country_document['type'],
-                              search=country_document['search'])
+                              search=country_document['search'],
+                              info=info)
 
     def transform_to_country_list(self, country_document_list):
         """
@@ -285,6 +289,8 @@ class RegionDocumentAdapter(object):
         Returns:
             Region: A region object with the data in region_document
         """
+        info=AreaInfoDocumentAdapter().transform_to_area_info_list(region_document['info'])\
+                if 'info' in region_document else []
         return create_region(name=region_document['name'], short_name=region_document['short_name'],
                              area=region_document['area'], uri=region_document['uri'],
                              iso3=region_document['iso3'], iso2=region_document['iso2'],
@@ -335,3 +341,26 @@ class AreaDocumentAdapter(object):
             A list of regions or countries, depending on the type
         """
         return [self.transform_to_area(area_document) for area_document in area_document_list]
+
+
+class AreaInfoDocumentAdapter(object):
+    """
+    Adapter class to transform area info from PyMongo format to Domain area info objects
+    """
+    def transform_to_area_info_list(self, area_info_document_dict):
+        """
+        Transforms a dict with area infos
+
+        Args:
+            area_info_document_dict (dict): Area info document dict in PyMongo format
+
+        Returns:
+            A list of area infos
+        """
+        return [AreaInfo(indicator_code=area_info_key,
+                         provider_name=area_info_document_dict[area_info_key]['provider']['name'],
+                         provider_url=area_info_document_dict[area_info_key]['provider']['url'],
+                         value=area_info_document_dict[area_info_key]['value'],
+                         year=area_info_document_dict[area_info_key]['year'])
+                for area_info_key in area_info_document_dict.keys()]
+
