@@ -177,6 +177,15 @@ class Indicator(Entity):
         self.increment_version()
 
     @property
+    def subindex(self):
+        return self._uri
+
+    @uri.setter
+    def subindex(self, subindex):
+        self._subindex = subindex
+        self.increment_version()
+
+    @property
     def provider_name(self):
         return self._provider_name
 
@@ -241,7 +250,10 @@ class Indicator(Entity):
 def create_indicator(id=None, index=None, indicator=None, name=None,
                      provider_url=None, description=None, uri= None,
                      parent=None,
+                     #component=None,
+                     # weight=None,
                      provider_name=None, republish=False, is_percentage=False,
+                     # high_low=None,
                      subindex=None, type=None, children=[]):
     """
     This function creates new indicators and acts as a factory
