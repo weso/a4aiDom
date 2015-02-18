@@ -2,11 +2,11 @@ __author__ = 'guillermo'
 
 
 from infrastructure.errors.errors import IndicatorRepositoryError
-from webindex.domain.model.indicator.indicator import Repository, Indicator
+from a4ai.domain.model.indicator.indicator import Repository, Indicator
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
 from utils import error, success, uri, normalize_group_name
-from webindex.domain.model.indicator.indicator import create_indicator
+from a4ai.domain.model.indicator.indicator import create_indicator
 
 
 class IndicatorRepository(Repository):
@@ -57,10 +57,8 @@ class IndicatorRepository(Repository):
         """
         _index = self.find_indicators_index()
         subindices = self.find_indicators_sub_indexes()
-        #components = self.find_indicators_components()
         indicators = self.find_indicators_indicators()
 
-        #result = (_index + subindices + components + indicators)
         result = (_index + subindices + indicators)
         return result
 
@@ -82,8 +80,6 @@ class IndicatorRepository(Repository):
         """
         return self.find_indicators_by_level("SubIndex")
 
-    #def find_indicators_components(self, parent=None):
-    #    return self.find_indicators_by_level("Component", parent)
 
     def find_indicators_primary(self, parent=None):
         """
@@ -130,7 +126,6 @@ class IndicatorRepository(Repository):
         search = {"type": level}
 
         if parent is not None:
-            # print parent
             code = parent.indicator
             _type = parent.type.lower()
             _filter = {}
@@ -145,7 +140,6 @@ class IndicatorRepository(Repository):
             code = indicator["indicator"]
             children = self.find_indicator_children(indicator)
             indicator["children"] = children
-            # self.indicator_uri(indicator)
             processed_indicators.append(indicator)
 
         return IndicatorDocumentAdapter().transform_to_indicator_list(processed_indicators)
@@ -183,10 +177,6 @@ class IndicatorRepository(Repository):
             processed_indicators.append(indicator)
 
         return processed_indicators
-
-    # def indicator_uri(self, indicator_code):
-    #     uri(url_root=self._url_root, element=indicator_code,
-    #         element_code="indicator", level="indicators")
 
     def insert_indicator(self, indicator, indicator_uri=None, component_name=None, subindex_name=None, index_name=None,
                          weight=None, provider_name=None, provider_url=None, is_percentage=None):
@@ -229,19 +219,19 @@ class IndicatorDocumentAdapter(object):
             Indicator: Indicator object with the data in indicator_document
         """
         return create_indicator(id=indicator_document['_id'],
-                         index=indicator_document['index'], indicator=indicator_document['indicator'],
-                         name=indicator_document['name'], parent=indicator_document['parent'],
-                         #component=indicator_document['component'],
-                         subindex=indicator_document['subindex'],
-                         type=indicator_document['type'], provider_url=indicator_document['provider_url'],
-                         description=indicator_document['description'], uri=indicator_document['uri'],
-                         #weight=indicator_document['weight'],
-                         provider_name=indicator_document['provider_name'],
-                         republish=indicator_document['republish'],
-                         children=self.transform_to_indicator_list(indicator_document['children']),
-                         is_percentage=indicator_document['is_percentage']
-                         #high_low=indicator_document['high_low'] if 'high_low' in indicator_document else None
-                         )
+                                index=indicator_document['index'],
+                                indicator=indicator_document['indicator'],
+                                name=indicator_document['name'],
+                                parent=indicator_document['parent'],
+                                subindex=indicator_document['subindex'],
+                                type=indicator_document['type'],
+                                provider_url=indicator_document['provider_url'],
+                                description=indicator_document['description'],
+                                uri=indicator_document['uri'],
+                                provider_name=indicator_document['provider_name'],
+                                republish=indicator_document['republish'],
+                                children=self.transform_to_indicator_list(indicator_document['children']),
+                                is_percentage=indicator_document['is_percentage'])
 
     def transform_to_indicator_list(self, indicator_document_list):
         """

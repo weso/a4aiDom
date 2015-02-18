@@ -2,10 +2,10 @@ __author__ = 'guillermo'
 
 import uuid
 from utility.mutators import mutate, when
-from webindex.domain.model.area.area import Area
-from webindex.domain.model.area.region import Region
-from webindex.domain.model.events import publish
-from webindex.domain.model.entity import Entity
+from a4ai.domain.model.area.area import Area
+from a4ai.domain.model.area.region import Region
+from a4ai.domain.model.events import publish
+from a4ai.domain.model.entity import Entity
 
 
 class Country(Area):

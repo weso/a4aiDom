@@ -1,14 +1,14 @@
-from webindex.domain.model.area.area_info import AreaInfo
+from a4ai.domain.model.area.area_info import AreaInfo
 
 __author__ = 'guillermo'
 
 from infrastructure.errors.errors import AreaRepositoryError
-from webindex.domain.model.area import area
-from webindex.domain.model.area.country import create_country
-from webindex.domain.model.area.region import create_region
+from a4ai.domain.model.area import area
+from a4ai.domain.model.area.country import create_country
+from a4ai.domain.model.area.region import create_region
 from config import port, db_name, host
 from .mongo_connection import connect_to_db
-from utils import error, uri
+from utils import uri
 
 
 class AreaRepository(area.Repository):
@@ -296,7 +296,8 @@ class RegionDocumentAdapter(object):
                              iso3=region_document['iso3'], iso2=region_document['iso2'],
                              iso_num=region_document['iso_num'], id=region_document['_id'],
                              search=region_document['search'],
-                             countries=CountryDocumentAdapter().transform_to_country_list(region_document['countries']))
+                             countries=CountryDocumentAdapter().transform_to_country_list(region_document['countries']),
+                             info=info)
 
     def transform_to_region_list(self, region_document_list):
         """

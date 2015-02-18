@@ -1,6 +1,6 @@
 __author__ = 'Herminio'
 
-from webindex.domain.model.entity import Entity
+from a4ai.domain.model.entity import Entity
 import uuid
 from ..events import DomainEvent, publish
 from utility.mutators import when, mutate

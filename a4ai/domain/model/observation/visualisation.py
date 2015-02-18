@@ -1,6 +1,6 @@
 __author__ = 'Herminio'
 
-from webindex.domain.model.observation.statistics import Statistics
+from a4ai.domain.model.observation.statistics import Statistics
 
 
 class Visualisation(object):

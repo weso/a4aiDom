@@ -1,8 +1,8 @@
-from webindex.domain.model.observation.statistics import Statistics
+from a4ai.domain.model.observation.statistics import Statistics
 
 __author__ = 'Herminio'
 
-from webindex.domain.model.observation.visualisation import Visualisation
+from a4ai.domain.model.observation.visualisation import Visualisation
 
 
 class GroupedByAreaVisualisation(object):
