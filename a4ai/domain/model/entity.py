@@ -1,5 +1,5 @@
-from webindex.domain.exceptions import ConsistencyError
-from webindex.domain.model.events import DomainEvent
+from infrastructure.errors.exceptions import ConsistencyError
+from a4ai.domain.model.events import DomainEvent
 
 
 # =======================================================================================

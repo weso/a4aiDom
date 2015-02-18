@@ -1,12 +1,11 @@
 __author__ = 'guillermo'
 
-from webindex.domain.model.entity import Entity
+from a4ai.domain.model.entity import Entity
 import uuid
-from webindex.domain.model.events import publish
+from a4ai.domain.model.events import publish
 from utility.mutators import when, mutate
 from abc import ABCMeta
-from webindex.domain.model.events import DomainEvent
-from webindex.domain.model.indicator.organization import Organization
+from a4ai.domain.model.events import DomainEvent
 
 
 # =======================================================================================
@@ -60,16 +59,13 @@ class Indicator(Entity):
         self._parent = event.parent
         self._provider_url = event.provider_url
         self._description = event.description
-        #self._component = event.component
         self._uri = event.uri
-        #self._weight = event.weight
         self._subindex = event.subindex
         self._type = event.type
         self._children = event.children
         self._provider_name = event.provider_name
         self._republish = event.republish
         self._is_percentage = event.is_percentage
-        #self._high_low = event.high_low
 
     def __repr__(self):
         return "{d}Indicator(id={id!r}," \
@@ -91,12 +87,9 @@ class Indicator(Entity):
         return {
             'index': self.index, 'indicator': self.indicator, 'name': self.name,
             'parent': self.parent, 'provider_url': self.provider_url, 'description': self.description,
-            #'component': self._component,
             'uri': self.uri,
-            #'weight': self._weight,
             'subindex': self.subindex,
             'id': self.id, 'type': self.type, 'children': [child.to_dict() for child in self.children],
-            #'high_low': self._high_low,
             'provider_name': self.provider_name, 'republish': self.republish, 'is_percentage': self.is_percentage
         }
 
@@ -143,24 +136,6 @@ class Indicator(Entity):
         self._parent = parent
         self.increment_version()
 
-    # @property
-    # def component(self):
-    #     return self._component
-    #
-    # @component.setter
-    # def component(self, component):
-    #     self._component = component
-    #     self.increment_version()
-
-    @property
-    def subindex(self):
-        return self._subindex
-
-    @subindex.setter
-    def subindex(self, subindex):
-        self._subindex = subindex
-        self.increment_version()
-
     @property
     def type(self):
         return self._type
@@ -199,15 +174,6 @@ class Indicator(Entity):
     @uri.setter
     def uri(self, uri):
         self._uri = uri
-        self.increment_version()
-
-    @property
-    def weight(self):
-        return self._weight
-
-    @weight.setter
-    def weight(self, weight):
-        self._weight = weight
         self.increment_version()
 
     @property
@@ -275,10 +241,7 @@ class Indicator(Entity):
 def create_indicator(id=None, index=None, indicator=None, name=None,
                      provider_url=None, description=None, uri= None,
                      parent=None,
-                     #component=None,
-                     # weight=None,
                      provider_name=None, republish=False, is_percentage=False,
-                     # high_low=None,
                      subindex=None, type=None, children=[]):
     """
     This function creates new indicators and acts as a factory
@@ -340,19 +303,6 @@ def _(event, indicator):
     indicator.increment_version()
     return indicator
 
-@when.register(Indicator.OrganizationAdded)
-def _(event, indicator):
-    """
-    It creates a organization object for adding to the indicator object
-    :param event:
-    :return:
-    """
-
-    indicator.validate_event_originator(event)
-    organization = Organization(event.label)
-    indicator.organization = organization
-    indicator.increment_version()
-    return indicator
 
 
 # =======================================================================================

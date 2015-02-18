@@ -2,8 +2,8 @@
 __author__ = 'guillermo'
 
 
-from webindex.domain.model.area.area import Area
-from webindex.domain.model.entity import Entity
+from a4ai.domain.model.area.area import Area
+from a4ai.domain.model.entity import Entity
 import uuid
 from ..events import DomainEvent, publish
 from utility.mutators import when, mutate

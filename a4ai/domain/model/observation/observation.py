@@ -1,12 +1,13 @@
 __author__ = 'guillermo'
 
-from webindex.domain.model.entity import Entity
-from webindex.domain.model.events import DomainEvent, publish
 import uuid
-from .computation import Computation
-from utility.mutators import mutate, when
-from ...exceptions import DiscardedEntityError
 from abc import ABCMeta
+
+from a4ai.domain.model.entity import Entity
+from a4ai.domain.model.events import DomainEvent, publish
+from utility.mutators import mutate, when
+from infrastructure.errors.exceptions import DiscardedEntityError
+
 
 
 # =======================================================================================
