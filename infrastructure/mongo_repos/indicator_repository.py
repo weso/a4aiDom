@@ -179,7 +179,7 @@ class IndicatorRepository(Repository):
         return processed_indicators
 
     def insert_indicator(self, indicator, indicator_uri=None, component_name=None, subindex_name=None, index_name=None,
-                         weight=None, provider_name=None, provider_url=None, is_percentage=None):
+                         weight=None, provider_name=None, provider_url=None, is_percentage=None, scale=None):
         indicator_dict = {}
         indicator_dict["index"] = normalize_group_name(index_name)
         indicator_dict["subindex"] = normalize_group_name(subindex_name)
@@ -193,6 +193,7 @@ class IndicatorRepository(Repository):
         indicator_dict['provider_name'] = provider_name
         indicator_dict['provider_url'] = provider_url
         indicator_dict['is_percentage'] = is_percentage
+        indicator_dict['scale'] = scale
 
         self._db['indicators'].insert(indicator_dict)
 
