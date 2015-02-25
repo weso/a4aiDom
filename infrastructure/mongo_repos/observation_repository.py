@@ -102,6 +102,14 @@ class ObservationRepository(Repository):
     def find_linked_observations(self):
         return success([obs for obs in self._db['linked_observations'].find()])
 
+    def get_all_indicators(self):
+        """
+        Returns all indicators mongodb filter to use in other queries
+
+        Returns:
+            dict: The filter for mongodb queries
+        """
+
     def get_indicators_by_code(self, code):
         """
         Returns an indicator mongodb filter to use in other queries
@@ -112,6 +120,9 @@ class ObservationRepository(Repository):
         Returns:
             dict: The filter for mongodb queries
         """
+        if code.lower() == 'ALL'.lower():  # case does not matter
+            return {}
+
         codes = code.upper().strip().split(",")
 
         for code in codes:
