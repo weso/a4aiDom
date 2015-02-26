@@ -54,6 +54,12 @@ class Country(Area):
         dictionary['type'] = self.type
         return dictionary
 
+    def to_dict_without_info(self):
+        dictionary = super(Country, self).to_dict_without_info()
+        dictionary['income'] = self.income
+        dictionary['type'] = self.type
+        return dictionary
+
 
 
 # =======================================================================================

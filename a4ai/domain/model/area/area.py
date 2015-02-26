@@ -74,6 +74,11 @@ class Area(Entity):
             'info': {area_info.indicator_code: area_info.to_dict() for area_info in self.info}
         }
 
+    def to_dict_without_info(self):
+        dict = self.to_dict()
+        del dict['info']
+        return dict
+
 # =======================================================================================
 # Properties
 # =======================================================================================

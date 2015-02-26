@@ -66,6 +66,7 @@ class Indicator(Entity):
         self._provider_name = event.provider_name
         self._republish = event.republish
         self._is_percentage = event.is_percentage
+        self._scale = event.scale
 
     def __repr__(self):
         return "{d}Indicator(id={id!r}," \
@@ -90,7 +91,8 @@ class Indicator(Entity):
             'uri': self.uri,
             'subindex': self.subindex,
             'id': self.id, 'type': self.type, 'children': [child.to_dict() for child in self.children],
-            'provider_name': self.provider_name, 'republish': self.republish, 'is_percentage': self.is_percentage
+            'provider_name': self.provider_name, 'republish': self.republish, 'is_percentage': self.is_percentage,
+            'scale': self.scale
         }
 
     # =======================================================================================
@@ -212,6 +214,15 @@ class Indicator(Entity):
         self._is_percentage = is_percentage
         self.increment_version()
 
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, scale):
+        self._scale = scale
+        self.increment_version()
+
     # =======================================================================================
     # Commands
     # =======================================================================================
@@ -249,11 +260,8 @@ class Indicator(Entity):
 # =======================================================================================
 def create_indicator(id=None, index=None, indicator=None, name=None,
                      provider_url=None, description=None, uri= None,
-                     parent=None,
-                     #component=None,
-                     # weight=None,
+                     parent=None, scale=None,
                      provider_name=None, republish=False, is_percentage=False,
-                     # high_low=None,
                      subindex=None, type=None, children=[]):
     """
     This function creates new indicators and acts as a factory
@@ -281,14 +289,12 @@ def create_indicator(id=None, index=None, indicator=None, name=None,
     event = Indicator.Created(originator_id=indicator_id, originator_version=0,
                               id=id, index=index, indicator=indicator, name=name,
                               parent=parent,
-                              #component=component,
                               provider_url=provider_url,
                               description=description, uri=uri,
-                              #weight=weight,
+                              scale=scale,
                               provider_name=provider_name, republish=republish,
                               subindex=subindex, type=type, children=children,
                               is_percentage=is_percentage
-                              #high_low=high_low
                               )
     indicator = when(event)
     publish(event)
@@ -314,7 +320,6 @@ def _(event, indicator):
     indicator._discarded = True
     indicator.increment_version()
     return indicator
-
 
 
 # =======================================================================================
