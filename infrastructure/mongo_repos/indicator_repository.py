@@ -232,7 +232,8 @@ class IndicatorDocumentAdapter(object):
                                 provider_name=indicator_document['provider_name'],
                                 republish=indicator_document['republish'],
                                 children=self.transform_to_indicator_list(indicator_document['children']),
-                                is_percentage=indicator_document['is_percentage'])
+                                is_percentage=indicator_document['is_percentage'],
+                                scale=indicator_document['scale'])
 
     def transform_to_indicator_list(self, indicator_document_list):
         """

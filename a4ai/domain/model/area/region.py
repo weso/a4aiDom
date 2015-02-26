@@ -48,6 +48,11 @@ class Region(Area):
         dictionary['countries'] = [country.to_dict() for country in self._countries]
         return dictionary
 
+    def to_dict_without_info(self):
+        dictionary = super(Region, self).to_dict_without_info()
+        dictionary['countries'] = [country.to_dict_without_info() for country in self._countries]
+        return dictionary
+
 # =======================================================================================
 # Properties
 # =======================================================================================

@@ -1,4 +1,7 @@
+from __builtin__ import reduce
 from a4ai.domain.model.area.area_info import AreaInfo
+from a4ai.domain.model.area.area_short_info import AreaShortInfo
+from a4ai.domain.model.area.indicator_info import IndicatorInfo, IndicatorInfoList
 
 __author__ = 'guillermo'
 
@@ -236,6 +239,24 @@ class AreaRepository(area.Repository):
             }
 
         self._db["areas"].update({"iso3": iso3}, {"$set": {"info": info_dict}})
+
+    def get_areas_info(self):
+        all_countries = self.find_countries(None)
+        indicator_codes = set([info.indicator_code for country in all_countries for info in country.info])
+        indicators_info_list = IndicatorInfoList()
+        for indicator_code in indicator_codes:
+            areas = []
+            provider_name, provider_url = ('', '')
+            for area in all_countries:
+                for info_of_area in area.info:
+                    if info_of_area.indicator_code == indicator_code:
+                        areas.append(AreaShortInfo(area.iso3, info_of_area.value, info_of_area.year))
+                provider_name, provider_url = (area.info[0].provider_name, area.info[0].provider_url) # a better solution can be implemented
+            indicator_info = IndicatorInfo(indicator_code, provider_name, provider_url)
+            indicator_info.values = areas
+            indicators_info_list.add_indicator_info(indicator_info)
+        return indicators_info_list
+
 
 
 class CountryDocumentAdapter(object):
