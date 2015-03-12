@@ -251,7 +251,7 @@ class AreaRepository(area.Repository):
                 for info_of_area in area.info:
                     if info_of_area.indicator_code == indicator_code:
                         areas.append(AreaShortInfo(area.iso3, info_of_area.value, info_of_area.year))
-                provider_name, provider_url = (area.info[0].provider_name, area.info[0].provider_url) # a better solution can be implemented
+                        provider_name, provider_url = (info_of_area.provider_name, info_of_area.provider_url)
             indicator_info = IndicatorInfo(indicator_code, provider_name, provider_url)
             indicator_info.values = areas
             indicators_info_list.add_indicator_info(indicator_info)
