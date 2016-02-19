@@ -47,6 +47,7 @@ class AreaRepository(area.Repository):
             {"name": area_name.upper()},
             {"name": area_name.title()},
             {"name": area_name.lower()},
+            {"short_name": area_name}
         ]})
         if area is None:
             raise AreaRepositoryError("No area with name " + area_name)
