@@ -38,6 +38,8 @@ class IndicatorRepository(Repository):
             IndicatorRepositoryError: If there is not an indicator with the given code
         """
         indicator_code = indicator_code.upper()
+        if indicator_code == "OVERALL AFFORDABILITY DRIVERS INDEX":
+            indicator_code = "INDEX"
         indicator = self._db['indicators'].find_one({"indicator": indicator_code})
 
         if indicator is None:
